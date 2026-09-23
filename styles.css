@@ -833,9 +833,31 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   content: none;
 }
 
-.wedding-card__frame > :not(.frame-corners) { position: relative; z-index: 1; }
+.wedding-card__frame > :not(.frame-corners):not(.card-particles) { position: relative; z-index: 1; }
 .frame-corners--page { inset: 10px; }
 .frame-corners--page .frame-corner { width: 64px; height: 64px; }
+
+.card-particles {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.card-particle {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  opacity: .4;
+  background: radial-gradient(circle, #fffdf4 0 14%, #d8ad4d 40%, #b4872766 67%, transparent 73%);
+  box-shadow: 0 0 8px 2px #d3aa4a30;
+  animation: card-dust-drift var(--duration) ease-in-out var(--delay) infinite alternate;
+  will-change: transform, opacity;
+}
 
 .guest h1 {
   margin: 0;
@@ -993,6 +1015,36 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   margin: 50px 0 0;
   padding: 10px 11px 14px;
 }
+
+.portrait-petals {
+  position: absolute;
+  z-index: 0;
+  inset: -20px -8px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.portrait-petal {
+  position: absolute;
+  width: 10px;
+  height: 16px;
+  border-radius: 70% 30% 68% 32% / 62% 38% 64% 36%;
+  opacity: 0;
+  background: linear-gradient(145deg, #fff7fa 8%, #edcad6 52%, #c98fa460 100%);
+  box-shadow: 0 2px 7px #9c66762e;
+  transform-origin: 70% 78%;
+  animation: portrait-petal-float var(--petal-duration) ease-in-out var(--petal-delay) infinite alternate;
+  transition: opacity 1.25s ease var(--petal-reveal-delay);
+  will-change: transform, opacity;
+}
+
+.couple.is-revealed .portrait-petal { opacity: var(--petal-opacity); }
+
+.portrait-petal--one { top: 8%; left: -1%; --petal-duration: 6.8s; --petal-delay: -1.7s; --petal-reveal-delay: .2s; --petal-opacity: .64; --petal-rotation: -24deg; --petal-x: 5px; --petal-y: -7px; }
+.portrait-petal--two { top: 24%; right: -2%; width: 8px; height: 13px; --petal-duration: 7.6s; --petal-delay: -4.8s; --petal-reveal-delay: .35s; --petal-opacity: .48; --petal-rotation: 32deg; --petal-x: -6px; --petal-y: 5px; }
+.portrait-petal--three { top: 52%; left: -2%; width: 8px; height: 14px; --petal-duration: 8.2s; --petal-delay: -3.2s; --petal-reveal-delay: .5s; --petal-opacity: .46; --petal-rotation: -48deg; --petal-x: 7px; --petal-y: 6px; }
+.portrait-petal--four { right: 1%; bottom: 17%; --petal-duration: 7.2s; --petal-delay: -5.5s; --petal-reveal-delay: .65s; --petal-opacity: .58; --petal-rotation: 21deg; --petal-x: -5px; --petal-y: -8px; }
+.portrait-petal--five { bottom: 4%; left: 7%; width: 7px; height: 12px; --petal-duration: 8.6s; --petal-delay: -2.4s; --petal-reveal-delay: .8s; --petal-opacity: .42; --petal-rotation: -12deg; --petal-x: 8px; --petal-y: -4px; }
 
 .couple__portrait {
   position: relative;
@@ -1448,6 +1500,16 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   100% { opacity: 0; filter: blur(7px); transform: scale(1.42); }
 }
 
+@keyframes card-dust-drift {
+  from { opacity: .22; transform: translate3d(calc(var(--drift) * -1), -3px, 0) scale(.78); }
+  to { opacity: .52; transform: translate3d(var(--drift), 4px, 0) scale(1.18); }
+}
+
+@keyframes portrait-petal-float {
+  from { transform: translate3d(0, 3px, 0) rotate(var(--petal-rotation)) scale(.92); }
+  to { transform: translate3d(var(--petal-x), var(--petal-y), 0) rotate(calc(var(--petal-rotation) + 16deg)) scale(1.04); }
+}
+
 @media (max-width: 359px) {
   .wedding-card { padding: 0; }
   .wedding-card__frame { padding-inline: 20px; border-width: 0; }
@@ -1577,7 +1639,9 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   .water-ripple,
   .water-lily { animation: none !important; }
   .opening-particles,
-  .swans__heart-glow { display: none; }
+  .swans__heart-glow,
+  .card-particles,
+  .portrait-petals { display: none; }
   .paper.is-opening .swan--left,
   .paper.is-open .swan--left { transform: translateX(10%) translateY(4%) scale(.92) rotate(-2deg); }
   .paper.is-opening .swan--right,

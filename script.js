@@ -5,6 +5,7 @@ const swans = document.querySelector(".swans");
 const leftSwan = document.querySelector(".swan--left");
 const rightSwan = document.querySelector(".swan--right");
 const openingParticles = document.querySelector(".opening-particles");
+const cardParticles = document.querySelector(".card-particles");
 const invitationMusic = document.querySelector("#invitation-music");
 const invitationApp = document.querySelector(".invitation-app");
 const loaderProgress = document.querySelector("#loader-progress");
@@ -56,6 +57,32 @@ particleBlueprints.forEach(([x, y, size, delay, duration, drift, targetX, target
   particle.style.setProperty("--target-x", `${targetX}px`);
   particle.style.setProperty("--target-y", `${targetY}px`);
   openingParticles?.append(particle);
+});
+
+const cardParticleBlueprints = [
+  [7, 4, 2, -1.4, 7.8, 7], [91, 8, 3, -5.1, 9.2, 9],
+  [12, 13, 3, -3.8, 8.4, 6], [95, 17, 2, -6.2, 7.5, 8],
+  [5, 22, 4, -4.5, 10.1, 10], [88, 27, 2, -2.2, 8.7, 7],
+  [14, 32, 2, -7.1, 9.5, 9], [96, 36, 3, -3.3, 7.9, 6],
+  [8, 41, 3, -5.7, 8.9, 8], [90, 46, 4, -1.8, 10.4, 10],
+  [4, 51, 2, -6.8, 7.7, 7], [94, 56, 3, -4.1, 9.6, 9],
+  [11, 61, 4, -2.7, 10.2, 8], [87, 66, 2, -5.9, 8.3, 6],
+  [6, 71, 3, -3.5, 9.1, 10], [96, 75, 2, -7.3, 7.6, 7],
+  [13, 80, 2, -1.1, 8.6, 6], [89, 84, 4, -4.8, 10.5, 9],
+  [5, 89, 3, -6.4, 9.3, 8], [94, 94, 2, -2.9, 7.8, 7],
+  [16, 97, 3, -5.3, 8.8, 9], [83, 99, 2, -3.9, 9.7, 6],
+];
+
+cardParticleBlueprints.forEach(([x, y, size, delay, duration, drift]) => {
+  const particle = document.createElement("i");
+  particle.className = "card-particle";
+  particle.style.setProperty("--x", `${x}%`);
+  particle.style.setProperty("--y", `${y}%`);
+  particle.style.setProperty("--size", `${size}px`);
+  particle.style.setProperty("--delay", `${delay}s`);
+  particle.style.setProperty("--duration", `${duration}s`);
+  particle.style.setProperty("--drift", `${drift}px`);
+  cardParticles?.append(particle);
 });
 
 function loadMusicBytes() {

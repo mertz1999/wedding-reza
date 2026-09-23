@@ -9,7 +9,7 @@
     <title>دعوت‌نامه عروسی ما</title>
     <link rel="preload" href="./src/fonts/IranNastaliq.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="preload" href="./src/assets/swan-lake-background-mobile.jpg" as="image" fetchpriority="high" />
-    <link rel="stylesheet" href="./styles.css?v=20260923-5" />
+    <link rel="stylesheet" href="./styles.css?v=20260923-6" />
   </head>
   <body class="is-loading">
     <div class="app-loader" id="app-loader" role="status" aria-live="polite" aria-label="در حال آماده‌سازی دعوت‌نامه">
@@ -51,6 +51,8 @@
 
       <article class="wedding-card" id="wedding-card" aria-labelledby="guest-heading" hidden>
         <div class="wedding-card__frame">
+          <div class="card-particles" aria-hidden="true"></div>
+
           <header class="guest">
             <span class="orchid-decor orchid-decor--card-top" aria-hidden="true">
               <img src="./src/assets/pink-orchid-branch-mobile.png" alt="" width="640" height="427" loading="eager" decoding="async" draggable="false">
@@ -79,6 +81,13 @@
           </section>
 
           <section class="couple" aria-labelledby="couple-heading">
+            <span class="portrait-petals" aria-hidden="true">
+              <i class="portrait-petal portrait-petal--one"></i>
+              <i class="portrait-petal portrait-petal--two"></i>
+              <i class="portrait-petal portrait-petal--three"></i>
+              <i class="portrait-petal portrait-petal--four"></i>
+              <i class="portrait-petal portrait-petal--five"></i>
+            </span>
             <div class="couple__portrait">
               <h2 id="couple-heading" class="couple__names">
                 <span class="couple__first-names"><span class="couple__person"><span id="bride-name">فرزانه</span></span><span class="couple__and">و</span><span class="couple__person"><span id="groom-name">رضا</span></span></span>
@@ -145,6 +154,6 @@
       src="./src/assets/sokoote-asheghane.mp3"
     ></audio>
     <noscript><p class="noscript-message">برای باز کردن کارت دعوت، لطفاً جاوااسکریپت مرورگر را فعال کنید.</p></noscript>
-    <script type="module" src="./script.js?v=20260923-5"></script>
+    <script type="module" src="./script.js?v=20260923-6"></script>
   </body>
 </html>
