@@ -1,7 +1,7 @@
 .tools/
+pages-dist/
 *.log
 *.sqlite-shm
 *.sqlite-wal
 .DS_Store
 Thumbs.db
-
