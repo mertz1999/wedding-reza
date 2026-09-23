@@ -1,10 +1,11 @@
-import { showWeddingCard, invitationDataReady } from "./invitation-page.js?v=20260923-3";
+import { showWeddingCard, invitationDataReady } from "./invitation-page.js?v=20260923-4";
 
 const paper = document.querySelector(".paper");
 const swans = document.querySelector(".swans");
 const leftSwan = document.querySelector(".swan--left");
 const rightSwan = document.querySelector(".swan--right");
 const openingParticles = document.querySelector(".opening-particles");
+const waterTouchEffects = document.querySelector(".water-touch-effects");
 const cardParticles = document.querySelector(".card-particles");
 const invitationMusic = document.querySelector("#invitation-music");
 const invitationApp = document.querySelector(".invitation-app");
@@ -12,6 +13,7 @@ const loaderProgress = document.querySelector("#loader-progress");
 const loaderPercent = document.querySelector("#loader-percent");
 const musicStartAt = 3;
 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let musicBytesPromise;
 const criticalAssetUrls = [
   "./src/assets/swan-lake-background-mobile.jpg",
@@ -23,6 +25,24 @@ const cardAssetUrls = [
   "./src/assets/hands-bouquet-cutout-mobile.png",
   "./src/assets/wedding-hands-bg-mobile.jpg",
 ];
+
+function tehranHour() {
+  const hour = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tehran",
+    hour: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date()).find((part) => part.type === "hour")?.value;
+  return Number(hour ?? new Date().getHours());
+}
+
+function openingAmbience(hour) {
+  if (hour >= 5 && hour < 10) return "morning";
+  if (hour >= 10 && hour < 17) return "day";
+  if (hour >= 17 && hour < 21) return "evening";
+  return "night";
+}
+
+paper.dataset.ambience = openingAmbience(tehranHour());
 
 const particleBlueprints = [
   [8, 24, 3, -1.2, 6.8, 10, -12, -3],
@@ -84,6 +104,29 @@ cardParticleBlueprints.forEach(([x, y, size, delay, duration, drift]) => {
   particle.style.setProperty("--drift", `${drift}px`);
   cardParticles?.append(particle);
 });
+
+function createWaterRipple(clientX, clientY) {
+  if (!waterTouchEffects || reducedMotion.matches || paper.classList.contains("is-open")) return;
+  const bounds = paper.getBoundingClientRect();
+  const x = Math.min(bounds.width - 12, Math.max(12, clientX - bounds.left));
+  const y = Math.min(bounds.height - 18, Math.max(bounds.height * .38, clientY - bounds.top));
+  const effect = document.createElement("span");
+  effect.className = "touch-effect";
+  effect.style.left = `${x}px`;
+  effect.style.top = `${y}px`;
+  effect.innerHTML = `
+    <b class="touch-ripple"></b>
+    <i class="touch-spark" style="--spark-x:-24px;--spark-y:-19px"></i>
+    <i class="touch-spark" style="--spark-x:22px;--spark-y:-15px"></i>
+    <i class="touch-spark" style="--spark-x:4px;--spark-y:-29px"></i>
+  `;
+  waterTouchEffects.append(effect);
+  window.setTimeout(() => effect.remove(), 1700);
+}
+
+paper.addEventListener("pointerdown", (event) => {
+  createWaterRipple(event.clientX, event.clientY);
+}, { passive: true });
 
 function loadMusicBytes() {
   if (!invitationMusic || !AudioContextClass) return null;
@@ -301,7 +344,13 @@ async function openInvitation() {
   await invitationOpened();
 }
 
-paper.addEventListener("click", openInvitation);
+paper.addEventListener("click", (event) => {
+  if (event.detail === 0) {
+    const bounds = paper.getBoundingClientRect();
+    createWaterRipple(bounds.left + bounds.width / 2, bounds.top + bounds.height * .56);
+  }
+  void openInvitation();
+});
 
 // Skip the swan opening when a direct link targets the full card.
 if (window.location.hash === "#wedding-card") void invitationReady.then(showWeddingCard);

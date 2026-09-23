@@ -184,19 +184,64 @@ body.is-ready .app-loader { opacity: 0; visibility: hidden; pointer-events: none
 
 .paper::before,
 .paper::after {
-  content: none;
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  transition: background 1.2s ease, opacity 1.2s ease;
 }
 
 .paper::before {
-  inset-inline-start: 0;
-  background: linear-gradient(90deg, transparent 93%, #00000004 99%, var(--paper));
-  transform-origin: left center;
+  background: linear-gradient(180deg, #fff4df12, #eebdc40a);
 }
 
 .paper::after {
-  inset-inline-end: 0;
-  background: linear-gradient(90deg, var(--paper), #00000004 2%, transparent 7%);
-  transform-origin: right center;
+  opacity: .75;
+  animation: ambience-glow 8s ease-in-out infinite alternate;
+}
+
+.paper[data-ambience="morning"]::before {
+  background: linear-gradient(180deg, #fff6d826 0%, #ffe4c819 46%, #fff9f20d 100%);
+}
+
+.paper[data-ambience="morning"]::after {
+  background: radial-gradient(circle at 43% 25%, #fffce08f 0 2%, #ffe7a83d 8%, transparent 25%);
+}
+
+.paper[data-ambience="day"]::before {
+  background: linear-gradient(180deg, #e6f6ff20 0%, #fffaf01f 52%, #f8dfe012 100%);
+}
+
+.paper[data-ambience="day"]::after {
+  background: radial-gradient(circle at 48% 27%, #fffef0a3 0 1.5%, #fff5c747 7%, transparent 23%);
+}
+
+.paper[data-ambience="evening"]::before {
+  background: linear-gradient(180deg, #c891b21a 0%, #f6b6ab17 48%, #a66f8a12 100%);
+}
+
+.paper[data-ambience="evening"]::after {
+  background: radial-gradient(circle at 50% 31%, #fff2c370 0 2%, #ecb26b2e 10%, transparent 27%);
+}
+
+.paper[data-ambience="night"]::before {
+  background: linear-gradient(180deg, #10203e9e 0%, #2633538c 47%, #312d4c80 100%);
+}
+
+.paper[data-ambience="night"]::after {
+  opacity: .9;
+  background:
+    radial-gradient(circle at 76% 15%, #fffdebe8 0 1.2%, #efe8ba5c 1.7%, transparent 7%),
+    radial-gradient(circle at 14% 11%, #fff 0 1px, transparent 1.7px),
+    radial-gradient(circle at 31% 19%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 57% 9%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 88% 27%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 67% 33%, #fff 0 1px, transparent 1.5px);
+}
+
+.paper[data-ambience="night"] .lake-lily img {
+  filter: saturate(.58) brightness(.78) drop-shadow(0 5px 7px #0e163952);
 }
 
 .lake-lilies {
@@ -252,6 +297,58 @@ body.is-ready .app-loader { opacity: 0; visibility: hidden; pointer-events: none
 }
 
 .paper.is-open .opening-particles { opacity: 0; }
+
+.water-touch-effects {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.touch-effect {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.touch-ripple,
+.touch-ripple::after {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 94px;
+  height: 30px;
+  border: 1px solid #d9b65eb8;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(.12);
+  opacity: 0;
+  box-shadow: 0 0 11px #fff8df57;
+  animation: touch-ripple-expand 1.45s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.touch-ripple::after {
+  content: "";
+  width: 76px;
+  height: 24px;
+  animation-delay: .16s;
+}
+
+.touch-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f3d47d;
+  box-shadow: 0 0 8px 2px #ffe8a05c;
+  animation: touch-spark-rise 1.15s ease-out both;
+}
+
+.touch-spark:nth-of-type(2) { animation-delay: .08s; }
+.touch-spark:nth-of-type(3) { animation-delay: .16s; }
 
 .lake-lily {
   position: absolute;
@@ -833,7 +930,7 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   content: none;
 }
 
-.wedding-card__frame > :not(.frame-corners):not(.card-particles) { position: relative; z-index: 1; }
+.wedding-card__frame > :not(.frame-corners):not(.card-particles):not(.story-thread) { position: relative; z-index: 1; }
 .frame-corners--page { inset: 10px; }
 .frame-corners--page .frame-corner { width: 64px; height: 64px; }
 
@@ -857,6 +954,57 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   box-shadow: 0 0 8px 2px #d3aa4a30;
   animation: card-dust-drift var(--duration) ease-in-out var(--delay) infinite alternate;
   will-change: transform, opacity;
+}
+
+.story-thread {
+  position: absolute;
+  z-index: 0;
+  inset-block: 0;
+  inset-inline-start: 9px;
+  width: 18px;
+  pointer-events: none;
+}
+
+.story-thread__rail {
+  position: absolute;
+  top: var(--story-start, 48px);
+  left: 50%;
+  width: 1px;
+  height: var(--story-length, calc(100% - 96px));
+  overflow: hidden;
+  background: linear-gradient(180deg, transparent, #b18c3242 4%, #b18c3242 96%, transparent);
+  transform: translateX(-50%);
+}
+
+.story-thread__rail::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--story-progress, 0px);
+  background: linear-gradient(180deg, #eed98c, var(--gold) 54%, #d49c34);
+  box-shadow: 0 0 8px #d6ae4b70;
+  transition: height .18s linear;
+}
+
+.story-thread__marker {
+  position: absolute;
+  top: var(--marker-top, 48px);
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border: 1px solid #b18c3278;
+  background: var(--paper-light);
+  box-shadow: 0 0 0 3px #f7dfe7bd;
+  opacity: .56;
+  transform: translate(-50%, -50%) rotate(45deg) scale(.8);
+  transition: opacity .55s ease, transform .65s cubic-bezier(.16, 1, .3, 1), background-color .55s ease, box-shadow .55s ease;
+}
+
+.story-thread__marker.is-passed {
+  opacity: 1;
+  background: #d9b85b;
+  box-shadow: 0 0 0 3px #f7dfe7dc, 0 0 11px #c99f3d8f;
+  transform: translate(-50%, -50%) rotate(45deg) scale(1);
 }
 
 .guest h1 {
@@ -1493,6 +1641,23 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   to { transform: translate3d(var(--drift), 0, 0) scale(1.18); filter: brightness(1.22); }
 }
 
+@keyframes ambience-glow {
+  from { filter: brightness(.96); }
+  to { filter: brightness(1.06); }
+}
+
+@keyframes touch-ripple-expand {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.12); }
+  18% { opacity: .9; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.7); }
+}
+
+@keyframes touch-spark-rise {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.45); }
+  24% { opacity: .92; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--spark-x)), calc(-50% + var(--spark-y))) scale(.15); }
+}
+
 @keyframes heart-arrival {
   0%, 64% { opacity: 0; filter: blur(6px); transform: scale(.58); }
   76% { opacity: .88; filter: blur(.5px); transform: scale(.94); }
@@ -1637,11 +1802,15 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   .water-scene::after,
   .water-foreground,
   .water-ripple,
-  .water-lily { animation: none !important; }
+  .water-lily,
+  .paper::after { animation: none !important; }
   .opening-particles,
   .swans__heart-glow,
   .card-particles,
   .portrait-petals { display: none; }
+  .water-touch-effects { display: none; }
+  .story-thread__rail::after { height: 100% !important; opacity: .6; }
+  .story-thread__marker { opacity: .72; transform: translate(-50%, -50%) rotate(45deg) scale(.9); }
   .paper.is-opening .swan--left,
   .paper.is-open .swan--left { transform: translateX(10%) translateY(4%) scale(.92) rotate(-2deg); }
   .paper.is-opening .swan--right,

@@ -9,7 +9,7 @@
     <title>دعوت‌نامه عروسی ما</title>
     <link rel="preload" href="./src/fonts/IranNastaliq.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="preload" href="./src/assets/swan-lake-background-mobile.jpg" as="image" fetchpriority="high" />
-    <link rel="stylesheet" href="./styles.css?v=20260923-6" />
+    <link rel="stylesheet" href="./styles.css?v=20260923-7" />
   </head>
   <body class="is-loading">
     <div class="app-loader" id="app-loader" role="status" aria-live="polite" aria-label="در حال آماده‌سازی دعوت‌نامه">
@@ -29,6 +29,7 @@
         </div>
 
         <div class="opening-particles" aria-hidden="true"></div>
+        <div class="water-touch-effects" aria-hidden="true"></div>
 
         <button class="swans" type="button" aria-label="نزدیک کردن قوها و باز کردن دعوت‌نامه" aria-controls="invitation" aria-expanded="false">
           <span class="swans__heart-glow" aria-hidden="true"></span>
@@ -52,6 +53,16 @@
       <article class="wedding-card" id="wedding-card" aria-labelledby="guest-heading" hidden>
         <div class="wedding-card__frame">
           <div class="card-particles" aria-hidden="true"></div>
+          <div class="story-thread" aria-hidden="true">
+            <span class="story-thread__rail"></span>
+            <i class="story-thread__marker" data-story-target=".guest"></i>
+            <i class="story-thread__marker" data-story-target=".hero-cutout"></i>
+            <i class="story-thread__marker" data-story-target=".countdown"></i>
+            <i class="story-thread__marker" data-story-target=".couple"></i>
+            <i class="story-thread__marker" data-story-target=".celebration"></i>
+            <i class="story-thread__marker" data-story-target=".rsvp"></i>
+            <i class="story-thread__marker" data-story-target=".card-footer"></i>
+          </div>
 
           <header class="guest">
             <span class="orchid-decor orchid-decor--card-top" aria-hidden="true">
@@ -154,6 +165,6 @@
       src="./src/assets/sokoote-asheghane.mp3"
     ></audio>
     <noscript><p class="noscript-message">برای باز کردن کارت دعوت، لطفاً جاوااسکریپت مرورگر را فعال کنید.</p></noscript>
-    <script type="module" src="./script.js?v=20260923-6"></script>
+    <script type="module" src="./script.js?v=20260923-7"></script>
   </body>
 </html>

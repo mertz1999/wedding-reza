@@ -2,6 +2,9 @@ import { wedding } from "./wedding-config.js";
 import { getGuestName, getWeddingTimestamp, getCountdown, getNeshanUrl } from "./invitation-data.js";
 
 const card = document.querySelector("#wedding-card");
+const cardFrame = card.querySelector(".wedding-card__frame");
+const storyThread = card.querySelector(".story-thread");
+const storyMarkers = [...card.querySelectorAll(".story-thread__marker")];
 const guestHeading = document.querySelector("#guest-heading");
 const status = document.querySelector("#countdown-status");
 const hasCeremonyTime = getWeddingTimestamp(wedding.startsAt) !== null;
@@ -21,6 +24,11 @@ let scrollFrame;
 let smoothScrollTarget = 0;
 let smoothScrollingReady = false;
 let cardOpenRecorded = false;
+let storyFrame;
+let storyResizeObserver;
+let storyListenersReady = false;
+let storyStart = 0;
+let storyEnd = 0;
 
 function setText(id, text, fallback = "") {
   document.getElementById(id).textContent = text?.trim() || fallback;
@@ -191,6 +199,59 @@ function startScrollReveals() {
   ];
 }
 
+function updateStoryThread() {
+  storyFrame = undefined;
+  if (card.hidden || !storyThread || storyEnd <= storyStart) return;
+  const frameTop = cardFrame.getBoundingClientRect().top;
+  const readingLine = window.innerHeight * .58;
+  const absoluteProgress = Math.min(storyEnd, Math.max(storyStart, readingLine - frameTop));
+  storyThread.style.setProperty("--story-progress", `${absoluteProgress - storyStart}px`);
+  for (const marker of storyMarkers) {
+    marker.classList.toggle("is-passed", absoluteProgress >= Number(marker.dataset.storyTop || 0));
+  }
+}
+
+function queueStoryUpdate() {
+  if (!storyFrame) storyFrame = window.requestAnimationFrame(updateStoryThread);
+}
+
+function layoutStoryThread() {
+  if (card.hidden || !storyThread) return;
+  const frameBounds = cardFrame.getBoundingClientRect();
+  const positions = [];
+  for (const marker of storyMarkers) {
+    const target = card.querySelector(marker.dataset.storyTarget);
+    if (!target) continue;
+    const targetBounds = target.getBoundingClientRect();
+    const top = targetBounds.top - frameBounds.top + Math.min(64, targetBounds.height * .24);
+    marker.dataset.storyTop = String(top);
+    marker.style.setProperty("--marker-top", `${top}px`);
+    positions.push(top);
+  }
+  if (positions.length < 2) return;
+  storyStart = Math.min(...positions);
+  storyEnd = Math.max(...positions);
+  storyThread.style.setProperty("--story-start", `${storyStart}px`);
+  storyThread.style.setProperty("--story-length", `${storyEnd - storyStart}px`);
+  queueStoryUpdate();
+}
+
+function startStoryThread() {
+  if (!storyThread) return;
+  if (!storyListenersReady) {
+    storyListenersReady = true;
+    window.addEventListener("scroll", queueStoryUpdate, { passive: true });
+    window.addEventListener("resize", layoutStoryThread);
+  }
+  if ("ResizeObserver" in window) {
+    storyResizeObserver?.disconnect();
+    storyResizeObserver = new ResizeObserver(layoutStoryThread);
+    storyResizeObserver.observe(cardFrame);
+  }
+  window.requestAnimationFrame(() => window.requestAnimationFrame(layoutStoryThread));
+  document.fonts?.ready.then(layoutStoryThread);
+}
+
 function maximumScroll() {
   return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
 }
@@ -276,17 +337,22 @@ export function showWeddingCard({ keepPaper = false } = {}) {
   guestHeading.focus({ preventScroll: true });
   startCountdown();
   startSmoothScrolling();
+  startStoryThread();
 }
 
 window.addEventListener("pagehide", () => {
   clearInterval(countdownInterval);
   for (const timer of openingRevealTimers) window.clearTimeout(timer);
   revealObserver?.disconnect();
+  storyResizeObserver?.disconnect();
+  if (storyFrame) window.cancelAnimationFrame(storyFrame);
+  storyFrame = undefined;
   stopSmoothScroll();
 });
 window.addEventListener("pageshow", (event) => {
   if (card.hidden) return;
   startCountdown();
+  startStoryThread();
   if (event.persisted) {
     // Timers/observers were stopped on pagehide; never restore invisible content.
     for (const section of card.querySelectorAll(".reveal-on-scroll")) section.classList.add("is-revealed");
