@@ -1,4 +1,4 @@
-import { showWeddingCard, invitationDataReady } from "./invitation-page.js?v=20260923-2";
+import { showWeddingCard, invitationDataReady } from "./invitation-page.js?v=20260923-3";
 
 const paper = document.querySelector(".paper");
 const swans = document.querySelector(".swans");
@@ -56,7 +56,11 @@ function updateLoadingProgress(completed, total) {
 
 async function prepareInvitation() {
   const startedAt = performance.now();
-  const tasks = [...criticalAssetUrls.map(preloadImage), invitationDataReady.catch(() => undefined)];
+  const tasks = [
+    ...criticalAssetUrls.map(preloadImage),
+    invitationDataReady.catch(() => undefined),
+    document.fonts?.load('32px "Iran Nastaliq"'),
+  ];
   let completed = 0;
   updateLoadingProgress(0, tasks.length);
 

@@ -17,7 +17,6 @@ let rsvpStorageKey = `wedding-rsvp:v1:${wedding.date || "undated"}:${invitationT
 let countdownInterval;
 let revealObserver;
 let openingRevealTimers = [];
-let cardSettleTimer;
 let scrollFrame;
 let smoothScrollTarget = 0;
 let smoothScrollingReady = false;
@@ -267,31 +266,32 @@ function startSmoothScrolling() {
 export function showWeddingCard({ keepPaper = false } = {}) {
   if (!card.hidden) return;
   void recordCardOpen();
-  document.documentElement.classList.add("card-is-visible", "card-is-entering");
+  // Install hidden reveal styles before focus or layout can paint the card.
+  startScrollReveals();
+  document.documentElement.classList.add("card-is-visible");
   card.hidden = false;
   document.querySelector(".paper").hidden = !keepPaper;
   document.title = wedding.bride && wedding.groom ? `جشن عروسی ${wedding.bride} و ${wedding.groom}` : "کارت دعوت عروسی ما";
   window.scrollTo(0, 0);
   guestHeading.focus({ preventScroll: true });
   startCountdown();
-  startScrollReveals();
   startSmoothScrolling();
-
-  window.clearTimeout(cardSettleTimer);
-  cardSettleTimer = window.setTimeout(() => {
-    document.documentElement.classList.remove("card-is-entering");
-    document.documentElement.classList.add("card-is-settled");
-  }, 1900);
 }
 
 window.addEventListener("pagehide", () => {
   clearInterval(countdownInterval);
   for (const timer of openingRevealTimers) window.clearTimeout(timer);
-  window.clearTimeout(cardSettleTimer);
   revealObserver?.disconnect();
   stopSmoothScroll();
 });
-window.addEventListener("pageshow", () => { if (!card.hidden) startCountdown(); });
+window.addEventListener("pageshow", (event) => {
+  if (card.hidden) return;
+  startCountdown();
+  if (event.persisted) {
+    // Timers/observers were stopped on pagehide; never restore invisible content.
+    for (const section of card.querySelectorAll(".reveal-on-scroll")) section.classList.add("is-revealed");
+  }
+});
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) clearInterval(countdownInterval);
   else if (!card.hidden) startCountdown();
