@@ -188,16 +188,16 @@ const swanTiming = {
 
 function swanFrames(direction) {
   return [
-    { offset: 0, x: -7, y: 4, rotation: -2, opacity: .96 },
-    { offset: .2, x: -3, y: 2, rotation: -1, opacity: 1 },
-    { offset: .54, x: 6, y: 0, rotation: 0, opacity: 1 },
-    { offset: .78, x: 11, y: -2, rotation: 1, opacity: 1 },
-    { offset: .9, x: 12, y: -2, rotation: 0, opacity: 1 },
-    { offset: 1, x: 12, y: -2, rotation: 0, opacity: 0 },
-  ].map(({ offset, x, y, rotation, opacity }) => ({
+    { offset: 0, x: -7, opacity: .96 },
+    { offset: .2, x: -3, opacity: 1 },
+    { offset: .54, x: 6, opacity: 1 },
+    { offset: .78, x: 11, opacity: 1 },
+    { offset: .9, x: 12, opacity: 1 },
+    { offset: 1, x: 12, opacity: 0 },
+  ].map(({ offset, x, opacity }) => ({
     offset,
     opacity,
-    transform: `translateX(${x * direction}%) translateY(${y}%) scale(.92) rotate(${rotation * direction}deg)`,
+    transform: `translateX(${x * direction}%) translateY(4%) scale(.92) rotate(${-2 * direction}deg)`,
   }));
 }
 

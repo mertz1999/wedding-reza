@@ -945,7 +945,7 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   overflow: hidden;
   padding: 84px 24px 58px;
   border: 1px solid var(--gold-soft);
-  border-radius: 50% 50% 46% 46% / 22% 22% 13% 13%;
+  border-radius: 50% / 22%;
   background: #765f3e;
   box-shadow:
     0 0 0 7px var(--paper),
@@ -1416,13 +1416,13 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
 .paper.is-opening .swan--left,
 .paper.is-open .swan--left {
   opacity: 0;
-  transform: translateX(12%) translateY(-2%) scale(.92) rotate(0deg);
+  transform: translateX(12%) translateY(4%) scale(.92) rotate(-2deg);
 }
 
 .paper.is-opening .swan--right,
 .paper.is-open .swan--right {
   opacity: 0;
-  transform: translateX(-12%) translateY(-2%) scale(.92) rotate(0deg);
+  transform: translateX(-12%) translateY(4%) scale(.92) rotate(2deg);
 }
 
 .paper.is-opening .swans__halo,
@@ -1506,9 +1506,9 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   .water-ripple,
   .water-lily { animation: none !important; }
   .paper.is-opening .swan--left,
-  .paper.is-open .swan--left { transform: translateX(10%) scale(.92); }
+  .paper.is-open .swan--left { transform: translateX(10%) translateY(4%) scale(.92) rotate(-2deg); }
   .paper.is-opening .swan--right,
-  .paper.is-open .swan--right { transform: translateX(-10%) scale(.92); }
+  .paper.is-open .swan--right { transform: translateX(-10%) translateY(4%) scale(.92) rotate(2deg); }
   .reveal-on-scroll,
   .reveal-on-scroll.is-revealed,
   .reveal-on-scroll .reveal-item,
