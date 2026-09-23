@@ -163,12 +163,13 @@ const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolv
 async function invitationOpened() {
   swans.disabled = true;
   paper.setAttribute("aria-busy", "true");
-  paper.classList.add("is-departing");
   document.documentElement.classList.add("invitation-is-transitioning");
+  showWeddingCard({ keepPaper: true });
+  paper.classList.add("is-departing");
 
-  // Give the completed swan scene a graceful exit before the card enters.
+  // Crossfade the completed swan scene over the entering card.
   await wait(900);
-  showWeddingCard();
+  paper.hidden = true;
   document.documentElement.classList.remove("invitation-is-transitioning");
   paper.removeAttribute("aria-busy");
 }

@@ -176,6 +176,13 @@ body.is-ready .app-loader { opacity: 0; visibility: hidden; pointer-events: none
   pointer-events: none;
 }
 
+.invitation-is-transitioning .paper {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  margin: auto;
+}
+
 .paper::before,
 .paper::after {
   content: none;

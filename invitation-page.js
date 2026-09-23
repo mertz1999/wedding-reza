@@ -187,8 +187,8 @@ function startScrollReveals() {
 
   for (const timer of openingRevealTimers) window.clearTimeout(timer);
   openingRevealTimers = [
-    window.setTimeout(() => guest?.classList.add("is-revealed"), 420),
-    window.setTimeout(() => hero?.classList.add("is-revealed"), 1080),
+    window.setTimeout(() => guest?.classList.add("is-revealed"), 650),
+    window.setTimeout(() => hero?.classList.add("is-revealed"), 1300),
   ];
 }
 
@@ -264,12 +264,12 @@ function startSmoothScrolling() {
   window.addEventListener("resize", () => { smoothScrollTarget = clampScroll(smoothScrollTarget); });
 }
 
-export function showWeddingCard() {
+export function showWeddingCard({ keepPaper = false } = {}) {
   if (!card.hidden) return;
   void recordCardOpen();
   document.documentElement.classList.add("card-is-visible", "card-is-entering");
   card.hidden = false;
-  document.querySelector(".paper").hidden = true;
+  document.querySelector(".paper").hidden = !keepPaper;
   document.title = wedding.bride && wedding.groom ? `جشن عروسی ${wedding.bride} و ${wedding.groom}` : "کارت دعوت عروسی ما";
   window.scrollTo(0, 0);
   guestHeading.focus({ preventScroll: true });
