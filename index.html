@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f3f3f3" />
+    <meta name="description" content="دعوت‌نامه عروسی" />
+    <title>دعوت‌نامه عروسی ما</title>
+    <link rel="preload" href="./src/fonts/IranNastaliq.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="./src/assets/swan-lake-background-mobile.jpg" as="image" fetchpriority="high" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="is-loading">
+    <div class="app-loader" id="app-loader" role="status" aria-live="polite" aria-label="در حال آماده‌سازی دعوت‌نامه">
+      <div class="app-loader__mark" aria-hidden="true"><span>ف</span><i></i><span>ر</span></div>
+      <p>در حال آماده‌سازی دعوت‌نامه…</p>
+      <div class="app-loader__track" aria-hidden="true"><i id="loader-progress"></i></div>
+      <small id="loader-percent">۰٪</small>
+    </div>
+
+    <main class="invitation-app" aria-hidden="true">
+      <div class="paper" id="invitation">
+        <div class="lake-lilies" aria-hidden="true">
+          <span class="lake-lily lake-lily--far-left"><img src="./src/assets/pink-water-lily-mobile.png" alt="" width="480" height="320" decoding="async" draggable="false"></span>
+          <span class="lake-lily lake-lily--far-right"><img src="./src/assets/pink-water-lily-mobile.png" alt="" width="480" height="320" decoding="async" draggable="false"></span>
+          <span class="lake-lily lake-lily--near-left"><img src="./src/assets/pink-water-lily-mobile.png" alt="" width="480" height="320" decoding="async" draggable="false"></span>
+          <span class="lake-lily lake-lily--near-right"><img src="./src/assets/pink-water-lily-mobile.png" alt="" width="480" height="320" decoding="async" draggable="false"></span>
+        </div>
+
+        <button class="swans" type="button" aria-label="نزدیک کردن قوها و باز کردن دعوت‌نامه" aria-controls="invitation" aria-expanded="false">
+          <span class="swan swan--left" aria-hidden="true">
+            <img src="./src/assets/white-swan-mobile.png" alt="" width="720" height="480" decoding="async" fetchpriority="high" draggable="false" />
+          </span>
+          <span class="swan swan--right" aria-hidden="true">
+            <img src="./src/assets/white-swan-mobile.png" alt="" width="720" height="480" decoding="async" fetchpriority="high" draggable="false" />
+          </span>
+        </button>
+
+        <div class="tap-cue" aria-hidden="true">
+          <span class="tap-cue__circle">
+            <i></i>
+            <svg viewBox="0 0 24 24"><path d="M8.8 11.2V6.7a1.55 1.55 0 0 1 3.1 0v3.2-5a1.55 1.55 0 0 1 3.1 0v5-3.2a1.55 1.55 0 0 1 3.1 0v6.4c0 4.2-2.6 7-6.5 7-2.6 0-4.1-1.1-5.5-3.1l-2.2-3.2a1.5 1.5 0 0 1 2.3-1.9l2.6 2.1"/></svg>
+          </span>
+          <p>برای شروع، صفحه را لمس کنید</p>
+        </div>
+      </div>
+
+      <article class="wedding-card" id="wedding-card" aria-labelledby="guest-heading" hidden>
+        <div class="wedding-card__frame">
+          <header class="guest">
+            <span class="orchid-decor orchid-decor--card-top" aria-hidden="true">
+              <img src="./src/assets/pink-orchid-branch-mobile.png" alt="" width="640" height="427" loading="eager" decoding="async" draggable="false">
+            </span>
+            <h1 id="guest-heading" tabindex="-1"><bdi id="guest-name">مهمان گرامی</bdi></h1>
+            <p id="guest-companions">به همراه خانوادهٔ محترم</p>
+            <span class="card-flourish" aria-hidden="true">✦</span>
+          </header>
+
+          <figure class="hero-cutout">
+            <img src="./src/assets/hands-bouquet-cutout-mobile.png" alt="دستان عروس و داماد در کنار دسته‌گل سفید" width="900" height="675" loading="lazy" decoding="async">
+          </figure>
+
+          <section class="countdown" aria-labelledby="countdown-heading">
+            <span class="orchid-decor orchid-decor--countdown" aria-hidden="true">
+              <img src="./src/assets/pink-orchid-branch-mobile.png" alt="" width="640" height="427" loading="lazy" decoding="async" draggable="false">
+            </span>
+            <h2 id="countdown-heading">تا روزِ عروسی‌مان</h2>
+            <dl class="countdown__digits" role="timer" aria-live="off" aria-label="زمان باقی‌مانده تا جشن عروسی">
+              <div><dt>روز</dt><dd id="countdown-days">—</dd></div>
+              <div><dt>ساعت</dt><dd id="countdown-hours">—</dd></div>
+              <div><dt>دقیقه</dt><dd id="countdown-minutes">—</dd></div>
+              <div><dt>ثانیه</dt><dd id="countdown-seconds">—</dd></div>
+            </dl>
+            <p class="countdown__status" id="countdown-status" role="status">تاریخ مراسم به‌زودی ثبت می‌شود</p>
+          </section>
+
+          <section class="couple" aria-labelledby="couple-heading">
+            <div class="couple__portrait">
+              <h2 id="couple-heading" class="couple__names">
+                <span class="couple__first-names"><span class="couple__person"><span id="bride-name">فرزانه</span></span><span class="couple__and">و</span><span class="couple__person"><span id="groom-name">رضا</span></span></span>
+                <span class="couple__family-line"><span class="couple__family" id="bride-family">بخشی</span><span class="couple__family-separator" aria-hidden="true">•</span><span class="couple__family" id="groom-family">تناکی زاده</span></span>
+              </h2>
+              <div class="card-divider" aria-hidden="true"><span>✦</span></div>
+              <p class="invitation-copy" id="invitation-copy">به نام خالق عشق
+
+تبسم عشق گوشه‌ای از نگاه خداست
+با نگاه او آغاز می‌کنیم…</p>
+            </div>
+          </section>
+
+          <section class="celebration" aria-label="زمان و مکان مراسم">
+            <span class="orchid-decor orchid-decor--celebration" aria-hidden="true">
+              <img src="./src/assets/pink-orchid-branch-mobile.png" alt="" width="640" height="427" loading="lazy" decoding="async" draggable="false">
+            </span>
+            <div class="celebration__date">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="1"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3M13 14h3M8 17h3"/></svg>
+              <h2>وعدهٔ ما</h2>
+              <time id="wedding-date">تاریخ مراسم</time>
+              <p id="wedding-time">ساعت مراسم</p>
+            </div>
+            <div class="celebration__venue">
+              <h2 id="venue-name">نام محل برگزاری</h2>
+              <address id="venue-address">نشانی محل برگزاری مراسم اینجا قرار می‌گیرد.</address>
+              <a class="location-link" id="neshan-link" aria-disabled="true" aria-describedby="location-note" tabindex="-1" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                مسیریابی با نشان
+                <svg class="location-link__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+              </a>
+              <p class="location-note" id="location-note">لینک نشان پس از ثبت مکان فعال می‌شود.</p>
+            </div>
+          </section>
+
+          <section class="rsvp" aria-labelledby="rsvp-heading">
+            <span class="orchid-decor orchid-decor--card-bottom" aria-hidden="true">
+              <img src="./src/assets/pink-orchid-branch-mobile.png" alt="" width="640" height="427" loading="lazy" decoding="async" draggable="false">
+            </span>
+            <span class="rsvp__mark" aria-hidden="true">✦</span>
+            <h2 id="rsvp-heading">آیا افتخار میزبانی شما را داریم؟</h2>
+            <p class="rsvp__lead">لطفاً حضور خود را به ما اطلاع دهید</p>
+            <div class="rsvp__choices" role="group" aria-labelledby="rsvp-heading">
+              <button class="rsvp__choice" type="button" data-rsvp="yes" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+                <span>با افتخار، می‌آییم</span>
+              </button>
+              <button class="rsvp__choice" type="button" data-rsvp="no" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+                <span>متأسفانه نمی‌توانیم</span>
+              </button>
+            </div>
+            <p class="rsvp__feedback" id="rsvp-feedback" role="status" aria-live="polite"></p>
+          </section>
+
+          <footer class="card-footer"><span aria-hidden="true">✦</span><p>به امید دیدارتان در زیباترین شب زندگی‌مان</p></footer>
+        </div>
+      </article>
+    </main>
+    <audio
+      id="invitation-music"
+      preload="none"
+      playsinline
+      src="./src/assets/sokoote-asheghane.mp3"
+    ></audio>
+    <noscript><p class="noscript-message">برای باز کردن کارت دعوت، لطفاً جاوااسکریپت مرورگر را فعال کنید.</p></noscript>
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

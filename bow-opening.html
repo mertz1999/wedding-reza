@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f0e8" />
+    <title>A beautiful beginning — Bow opening</title>
+    <link rel="stylesheet" href="./bow-opening.css" />
+  </head>
+  <body>
+    <header class="page-header"><a class="monogram" href="./index.html" aria-label="Wedding invitation">F &amp; R</a><a class="back-link" href="./index.html">Back to invitation</a></header>
+    <main>
+      <h1>A little knot. <span>A beautiful beginning.</span></h1>
+      <div class="scene" data-state="closed">
+        <div class="envelope">
+          <section class="reveal" id="reveal" aria-hidden="true" inert>
+            <div class="reveal__ornament" aria-hidden="true">✧</div>
+            <p class="reveal__intro" lang="fa" dir="rtl">آغاز یک قصهٔ عاشقانه</p>
+            <h2 tabindex="-1" lang="fa" dir="rtl"><span id="bride">فرزانه</span><em>و</em><span id="groom">رضا</span></h2>
+            <div class="reveal__rule" aria-hidden="true"></div>
+            <p class="reveal__date" id="wedding-date" lang="fa" dir="rtl"></p>
+            <a class="invitation-link" href="./index.html#wedding-card">View invitation <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-5-5 5 5-5 5"/></svg></a>
+          </section>
+          <div class="door door--left" aria-hidden="true"></div>
+          <div class="door door--right" aria-hidden="true"></div>
+        </div>
+        <div class="ribbon-stage" aria-hidden="true">
+          <svg class="silk" viewBox="-350 -260 700 650" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="silk-loop" x1="0" y1="0" x2=".32" y2="1">
+                <stop stop-color="#a7864d"/><stop offset=".16" stop-color="#dfc698"/><stop offset=".34" stop-color="#f9e8c3"/><stop offset=".48" stop-color="#dfc08b"/><stop offset=".73" stop-color="#bea06b"/><stop offset=".89" stop-color="#f4dfb5"/><stop offset="1" stop-color="#a68349"/>
+              </linearGradient>
+              <linearGradient id="silk-tail" x1="0" y1=".35" x2="1" y2=".6">
+                <stop stop-color="#a98854"/><stop offset=".12" stop-color="#e9d1a6"/><stop offset=".3" stop-color="#f6e4bf"/><stop offset=".52" stop-color="#d9ba83"/><stop offset=".77" stop-color="#c4a06a"/><stop offset=".95" stop-color="#ead3a6"/><stop offset="1" stop-color="#f9e5bc"/>
+              </linearGradient>
+              <linearGradient id="silk-back" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6d512b"/><stop offset=".45" stop-color="#b28f57"/><stop offset="1" stop-color="#e1c69b"/></linearGradient>
+              <linearGradient id="silk-band" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a78858"/><stop offset=".08" stop-color="#eed8af"/><stop offset=".45" stop-color="#d5b886"/><stop offset=".85" stop-color="#e3cba0"/><stop offset="1" stop-color="#a58655"/></linearGradient>
+              <linearGradient id="silk-knot" x1="0" y1="0" x2="1" y2=".12"><stop stop-color="#9d7c49"/><stop offset=".13" stop-color="#f2ddb5"/><stop offset=".34" stop-color="#d4b17c"/><stop offset=".55" stop-color="#f5e2bc"/><stop offset=".78" stop-color="#c4a16d"/><stop offset=".95" stop-color="#eed5a7"/><stop offset="1" stop-color="#9d7c49"/></linearGradient>
+              <filter id="fabric" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence baseFrequency=".75 .24" numOctaves="2" seed="8" result="grain"/><feColorMatrix in="grain" type="saturate" values="0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+              <filter id="shadow" x="-70%" y="-70%" width="240%" height="240%"><feDropShadow dx="0" dy="9" stdDeviation="6" flood-color="#554023" flood-opacity=".22"/></filter>
+            </defs>
+            <g id="ribbon-pieces" filter="url(#shadow)"></g>
+          </svg>
+        </div>
+        <button class="bow-hit" type="button" aria-label="Untie the bow and open the invitation" aria-controls="reveal" aria-expanded="false"></button>
+      </div>
+      <div class="interaction-caption"><p id="hint">Touch the bow to unfold</p><button class="replay" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg>Tie it once more</button><button class="motion-preview" type="button" hidden>Preview full animation</button></div>
+      <p class="sr-only" role="status" id="animation-status"></p>
+    </main>
+    <footer><span></span>Made for a beautiful beginning<span></span></footer>
+    <noscript><p class="noscript">Please enable JavaScript to untie the bow, or <a href="./index.html">view the invitation</a>.</p></noscript>
+    <script type="module" src="./bow-opening.js"></script>
+  </body>
+</html>

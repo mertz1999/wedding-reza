@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7e3e9">
+    <meta name="robots" content="noindex,nofollow">
+    <title>مدیریت مهمان‌ها</title>
+    <link rel="stylesheet" href="./admin.css">
+  </head>
+  <body>
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <h1>مدیریت مهمان‌ها</h1>
+          <p>ساخت لینک اختصاصی و مشاهدهٔ وضعیت دعوت‌نامه‌ها</p>
+        </div>
+        <span class="server-status"><i aria-hidden="true"></i> سامانه فعال است</span>
+      </header>
+
+      <section class="summary" aria-label="خلاصه وضعیت">
+        <article><span class="summary__icon summary__icon--rose">♙</span><div><p>کل مهمان‌ها</p><strong id="total-count">۰</strong></div></article>
+        <article><span class="summary__icon summary__icon--gold">⌁</span><div><p>لینک بازشده</p><strong id="viewed-count">۰</strong></div></article>
+        <article><span class="summary__icon summary__icon--green">✓</span><div><p>پاسخ مثبت</p><strong id="yes-count">۰</strong></div></article>
+        <article><span class="summary__icon summary__icon--red">×</span><div><p>پاسخ منفی</p><strong id="no-count">۰</strong></div></article>
+      </section>
+
+      <div class="admin-layout">
+        <aside class="create-panel">
+          <h2>ساخت لینک دعوت جدید</h2>
+          <p>برای هر مهمان یک لینک امن و اختصاصی بسازید.</p>
+          <form id="guest-form">
+            <label for="guest-name">نام مهمان</label>
+            <input id="guest-name" name="guestName" required maxlength="120" autocomplete="off" placeholder="مثلاً: آقای احمدی و خانواده">
+
+            <label for="guest-phone">شماره تلفن <small>(اختیاری)</small></label>
+            <input id="guest-phone" name="phone" maxlength="32" inputmode="tel" autocomplete="tel" placeholder="مثلاً: ۰۹۱۲۱۲۳۴۵۶۷">
+
+            <label for="public-base">آدرس عمومی سایت</label>
+            <input id="public-base" name="publicBase" type="url" inputmode="url" dir="ltr" placeholder="https://example.ngrok-free.dev">
+            <p class="field-note">برای لینک قابل ارسال، آدرس ngrok را اینجا قرار دهید.</p>
+
+            <button class="primary-button" type="submit">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg>
+              ساخت لینک اختصاصی
+            </button>
+          </form>
+          <div class="created-link" id="created-link" hidden>
+            <p>لینک مهمان آماده شد</p>
+            <div><input id="created-link-value" readonly dir="ltr"><button type="button" id="copy-created-link">کپی</button></div>
+          </div>
+        </aside>
+
+        <section class="guest-panel">
+          <div class="guest-panel__header">
+            <div><h2>فهرست مهمان‌ها</h2><p>آخرین وضعیت بازشدن کارت و پاسخ حضور</p></div>
+            <label class="search-box">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+              <input id="guest-search" type="search" placeholder="جستجو در نام یا شماره تلفن…">
+            </label>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>نام مهمان</th><th>شماره تلفن</th><th>بازشدن لینک</th><th>بازشدن کارت</th><th>پاسخ حضور</th><th>آخرین فعالیت</th><th>لینک دعوت</th><th><span class="sr-only">عملیات</span></th></tr></thead>
+              <tbody id="guest-rows"></tbody>
+            </table>
+            <div class="empty-state" id="empty-state" hidden>
+              <span>♡</span><h3>هنوز مهمانی ثبت نشده است</h3><p>اولین لینک دعوت را از فرم کنار صفحه بسازید.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./admin.js"></script>
+  </body>
+</html>
