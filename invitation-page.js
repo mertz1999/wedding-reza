@@ -16,6 +16,8 @@ const rsvpFeedback = document.querySelector("#rsvp-feedback");
 let rsvpStorageKey = `wedding-rsvp:v1:${wedding.date || "undated"}:${invitationToken || guestName}`;
 let countdownInterval;
 let revealObserver;
+let openingRevealTimers = [];
+let cardSettleTimer;
 let scrollFrame;
 let smoothScrollTarget = 0;
 let smoothScrollingReady = false;
@@ -150,6 +152,9 @@ function startCountdown() {
 
 function startScrollReveals() {
   const sections = [...card.querySelectorAll(".guest, .hero-cutout, .countdown, .couple, .celebration, .rsvp, .card-footer")];
+  const guest = card.querySelector(".guest");
+  const hero = card.querySelector(".hero-cutout");
+  const openingSections = new Set([guest, hero]);
   for (const section of sections) {
     section.classList.add("reveal-on-scroll");
     if (section.classList.contains("couple")) continue;
@@ -176,7 +181,15 @@ function startScrollReveals() {
     }
   }, { threshold: .1, rootMargin: "0px 0px -7% 0px" });
 
-  for (const section of sections) revealObserver.observe(section);
+  for (const section of sections) {
+    if (!openingSections.has(section)) revealObserver.observe(section);
+  }
+
+  for (const timer of openingRevealTimers) window.clearTimeout(timer);
+  openingRevealTimers = [
+    window.setTimeout(() => guest?.classList.add("is-revealed"), 420),
+    window.setTimeout(() => hero?.classList.add("is-revealed"), 1080),
+  ];
 }
 
 function maximumScroll() {
@@ -254,8 +267,8 @@ function startSmoothScrolling() {
 export function showWeddingCard() {
   if (!card.hidden) return;
   void recordCardOpen();
+  document.documentElement.classList.add("card-is-visible", "card-is-entering");
   card.hidden = false;
-  document.documentElement.classList.add("card-is-visible");
   document.querySelector(".paper").hidden = true;
   document.title = wedding.bride && wedding.groom ? `جشن عروسی ${wedding.bride} و ${wedding.groom}` : "کارت دعوت عروسی ما";
   window.scrollTo(0, 0);
@@ -263,10 +276,18 @@ export function showWeddingCard() {
   startCountdown();
   startScrollReveals();
   startSmoothScrolling();
+
+  window.clearTimeout(cardSettleTimer);
+  cardSettleTimer = window.setTimeout(() => {
+    document.documentElement.classList.remove("card-is-entering");
+    document.documentElement.classList.add("card-is-settled");
+  }, 1900);
 }
 
 window.addEventListener("pagehide", () => {
   clearInterval(countdownInterval);
+  for (const timer of openingRevealTimers) window.clearTimeout(timer);
+  window.clearTimeout(cardSettleTimer);
   revealObserver?.disconnect();
   stopSmoothScroll();
 });

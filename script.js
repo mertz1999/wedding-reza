@@ -158,9 +158,19 @@ function startInvitationMusic() {
     });
 }
 
-function invitationOpened() {
+const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+async function invitationOpened() {
   swans.disabled = true;
+  paper.setAttribute("aria-busy", "true");
+  paper.classList.add("is-departing");
+  document.documentElement.classList.add("invitation-is-transitioning");
+
+  // Give the completed swan scene a graceful exit before the card enters.
+  await wait(900);
   showWeddingCard();
+  document.documentElement.classList.remove("invitation-is-transitioning");
+  paper.removeAttribute("aria-busy");
 }
 
 paper.classList.add("uses-waapi");
@@ -190,7 +200,7 @@ function finishInstantly() {
   paper.dataset.animationEngine = "fallback";
   swans.setAttribute("aria-expanded", "true");
   paper.classList.add("is-open");
-  invitationOpened();
+  void invitationOpened();
 }
 
 async function openInvitation() {
@@ -220,7 +230,7 @@ async function openInvitation() {
   paper.classList.add("is-open");
   paper.removeAttribute("aria-busy");
   animations.forEach((animation) => animation.cancel());
-  invitationOpened();
+  await invitationOpened();
 }
 
 paper.addEventListener("click", openInvitation);
