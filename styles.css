@@ -207,6 +207,52 @@ body.is-ready .app-loader { opacity: 0; visibility: hidden; pointer-events: none
   pointer-events: none;
 }
 
+.opening-particles {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 5%, #000 16%, #000 88%, transparent 98%);
+  mask-image: linear-gradient(to bottom, transparent 5%, #000 16%, #000 88%, transparent 98%);
+  transition: opacity .45s ease;
+}
+
+.opening-particle {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  opacity: .58;
+  box-shadow: 0 0 7px 2px #d7ae5552;
+  animation: water-dust-float var(--duration) ease-in-out var(--delay) infinite alternate;
+  transition:
+    left 2.95s cubic-bezier(.55, 0, .18, 1),
+    top 2.95s cubic-bezier(.55, 0, .18, 1),
+    opacity .55s ease 2.95s;
+  will-change: left, top, transform, opacity;
+}
+
+.opening-particle--gold {
+  background: radial-gradient(circle, #fffdf5 0 18%, #e7c467 42%, #b8892770 70%, transparent 74%);
+}
+
+.opening-particle--pearl {
+  opacity: .68;
+  background: radial-gradient(circle, #fff 0 24%, #fbeaf0 44%, #d9c5d08a 69%, transparent 74%);
+  box-shadow: 0 0 8px 2px #fff7f0a3;
+}
+
+.paper.is-opening .opening-particle {
+  left: calc(50% + var(--target-x));
+  top: calc(33% + var(--target-y));
+  opacity: 0;
+}
+
+.paper.is-open .opening-particles { opacity: 0; }
+
 .lake-lily {
   position: absolute;
   display: block;
@@ -471,7 +517,7 @@ body.is-ready .app-loader { opacity: 0; visibility: hidden; pointer-events: none
 
 .swans__heart-glow {
   position: absolute;
-  z-index: -1;
+  z-index: 0;
   top: 12%;
   left: 42%;
   width: 16%;
@@ -489,6 +535,19 @@ body.is-ready .app-loader { opacity: 0; visibility: hidden; pointer-events: none
 }
 
 .swans__heart-glow::before { content: "♥"; }
+
+.swans__heart-glow::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border: 1px solid #e4c777b8;
+  border-radius: 50%;
+  box-shadow: 0 0 18px 5px #efd27c52;
+}
+
+.paper.is-opening .swans__heart-glow {
+  animation: heart-arrival 3.8s cubic-bezier(.22, .61, .36, 1) both;
+}
 
 .swan {
   position: absolute;
@@ -1377,6 +1436,18 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   50% { transform: translateY(-7px); }
 }
 
+@keyframes water-dust-float {
+  from { transform: translate3d(calc(var(--drift) * -1), 0, 0) scale(.78); filter: brightness(.92); }
+  to { transform: translate3d(var(--drift), 0, 0) scale(1.18); filter: brightness(1.22); }
+}
+
+@keyframes heart-arrival {
+  0%, 64% { opacity: 0; filter: blur(6px); transform: scale(.58); }
+  76% { opacity: .88; filter: blur(.5px); transform: scale(.94); }
+  86% { opacity: .62; filter: blur(1.5px); transform: scale(1.08); }
+  100% { opacity: 0; filter: blur(7px); transform: scale(1.42); }
+}
+
 @media (max-width: 359px) {
   .wedding-card { padding: 0; }
   .wedding-card__frame { padding-inline: 20px; border-width: 0; }
@@ -1505,6 +1576,8 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   .water-foreground,
   .water-ripple,
   .water-lily { animation: none !important; }
+  .opening-particles,
+  .swans__heart-glow { display: none; }
   .paper.is-opening .swan--left,
   .paper.is-open .swan--left { transform: translateX(10%) translateY(4%) scale(.92) rotate(-2deg); }
   .paper.is-opening .swan--right,

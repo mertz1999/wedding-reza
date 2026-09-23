@@ -4,6 +4,7 @@ const paper = document.querySelector(".paper");
 const swans = document.querySelector(".swans");
 const leftSwan = document.querySelector(".swan--left");
 const rightSwan = document.querySelector(".swan--right");
+const openingParticles = document.querySelector(".opening-particles");
 const invitationMusic = document.querySelector("#invitation-music");
 const invitationApp = document.querySelector(".invitation-app");
 const loaderProgress = document.querySelector("#loader-progress");
@@ -21,6 +22,41 @@ const cardAssetUrls = [
   "./src/assets/hands-bouquet-cutout-mobile.png",
   "./src/assets/wedding-hands-bg-mobile.jpg",
 ];
+
+const particleBlueprints = [
+  [8, 24, 3, -1.2, 6.8, 10, -12, -3],
+  [17, 41, 2, -4.6, 8.2, 16, -8, 7],
+  [27, 18, 4, -2.8, 7.4, 12, -15, 3],
+  [37, 62, 2, -6.1, 6.2, 9, -6, 10],
+  [45, 27, 3, -3.7, 8.8, 14, -3, -5],
+  [53, 73, 2, -1.9, 7.8, 11, 3, 9],
+  [62, 20, 3, -5.4, 6.6, 15, 7, -4],
+  [72, 48, 4, -.8, 8.5, 10, 11, 5],
+  [84, 29, 2, -4.2, 7.1, 13, 15, -2],
+  [93, 65, 3, -2.5, 6.4, 8, 17, 8],
+  [12, 76, 2, -5.9, 8.9, 12, -16, 11],
+  [23, 55, 3, -.6, 7.6, 15, -11, 6],
+  [34, 35, 2, -3.1, 6.9, 9, -7, -1],
+  [48, 52, 4, -6.5, 8.1, 13, -2, 5],
+  [59, 39, 2, -1.4, 7.3, 11, 5, 1],
+  [68, 68, 3, -4.9, 8.7, 16, 9, 10],
+  [79, 16, 2, -2.2, 6.5, 8, 13, -6],
+  [89, 79, 3, -5.6, 7.9, 14, 16, 12],
+];
+
+particleBlueprints.forEach(([x, y, size, delay, duration, drift, targetX, targetY], index) => {
+  const particle = document.createElement("i");
+  particle.className = `opening-particle opening-particle--${index % 3 === 0 ? "pearl" : "gold"}`;
+  particle.style.setProperty("--x", `${x}%`);
+  particle.style.setProperty("--y", `${y}%`);
+  particle.style.setProperty("--size", `${size}px`);
+  particle.style.setProperty("--delay", `${delay}s`);
+  particle.style.setProperty("--duration", `${duration}s`);
+  particle.style.setProperty("--drift", `${drift}px`);
+  particle.style.setProperty("--target-x", `${targetX}px`);
+  particle.style.setProperty("--target-y", `${targetY}px`);
+  openingParticles?.append(particle);
+});
 
 function loadMusicBytes() {
   if (!invitationMusic || !AudioContextClass) return null;
