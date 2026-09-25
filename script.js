@@ -1,4 +1,4 @@
-import { showWeddingCard, invitationDataReady } from "./invitation-page.js?v=20260925-2";
+import { showWeddingCard, invitationDataReady } from "./invitation-page.js?v=20260925-3";
 
 const paper = document.querySelector(".paper");
 const swans = document.querySelector(".swans");

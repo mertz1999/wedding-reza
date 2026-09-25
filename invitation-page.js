@@ -163,7 +163,7 @@ function startCountdown() {
 }
 
 function startScrollReveals() {
-  const sections = [...card.querySelectorAll(".guest, .hero-cutout, .countdown, .couple, .celebration, .rsvp, .card-footer")];
+  const sections = [...card.querySelectorAll(".guest, .hero-cutout, .countdown, .couple, .celebration, .rsvp, .card-footer, .venue-finale")];
   const guest = card.querySelector(".guest");
   const hero = card.querySelector(".hero-cutout");
   const openingSections = new Set([guest, hero]);

@@ -15,6 +15,7 @@ const publicFiles = [
   "src/assets/white-swan-mobile.png",
   "src/assets/pink-orchid-branch-mobile.png",
   "src/assets/hands-bouquet-cutout-mobile.png",
+  "src/assets/venue-building-cutout.webp",
   "src/assets/swan-lake-background-mobile.jpg",
   "src/assets/wedding-hands-bg-mobile.jpg",
   "src/assets/sokoote-asheghane.mp3",
@@ -38,4 +39,3 @@ await writeFile(join(output, "index.html"), pagesHtml, "utf8");
 await writeFile(join(output, ".nojekyll"), "", "utf8");
 
 console.log(`GitHub Pages artifact created at ${output}`);
-
