@@ -9,7 +9,7 @@
     <title>دعوت‌نامه عروسی ما</title>
     <link rel="preload" href="./src/fonts/IranNastaliq.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="preload" href="./src/assets/swan-lake-background-mobile.jpg" as="image" fetchpriority="high" />
-    <link rel="stylesheet" href="./styles.css?v=20260925-1" />
+    <link rel="stylesheet" href="./styles.css?v=20260925-2" />
   </head>
   <body class="is-loading">
     <div class="app-loader" id="app-loader" role="status" aria-live="polite" aria-label="در حال آماده‌سازی دعوت‌نامه">
@@ -158,6 +158,11 @@
         </div>
       </article>
 
+      <button class="scroll-prompt" id="scroll-prompt" type="button" aria-label="رفتن به ادامهٔ دعوت‌نامه" aria-controls="countdown-heading" hidden>
+        <span class="scroll-prompt__text">کمی پایین‌تر، قصهٔ ما ادامه دارد…</span>
+        <span class="scroll-prompt__trail" aria-hidden="true"><i></i></span>
+      </button>
+
       <button class="music-toggle" id="music-toggle" type="button" data-state="paused" aria-label="پخش موسیقی" aria-pressed="false" title="پخش موسیقی" hidden>
         <span class="music-toggle__play" aria-hidden="true"></span>
         <span class="music-toggle__equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -170,6 +175,6 @@
       src="./src/assets/sokoote-asheghane.mp3"
     ></audio>
     <noscript><p class="noscript-message">برای باز کردن کارت دعوت، لطفاً جاوااسکریپت مرورگر را فعال کنید.</p></noscript>
-    <script type="module" src="./script.js?v=20260925-1"></script>
+    <script type="module" src="./script.js?v=20260925-2"></script>
   </body>
 </html>

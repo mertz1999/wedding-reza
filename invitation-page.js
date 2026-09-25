@@ -5,6 +5,7 @@ const card = document.querySelector("#wedding-card");
 const cardFrame = card.querySelector(".wedding-card__frame");
 const storyThread = card.querySelector(".story-thread");
 const storyMarkers = [...card.querySelectorAll(".story-thread__marker")];
+const scrollPrompt = document.querySelector("#scroll-prompt");
 const guestHeading = document.querySelector("#guest-heading");
 const status = document.querySelector("#countdown-status");
 const hasCeremonyTime = getWeddingTimestamp(wedding.startsAt) !== null;
@@ -29,6 +30,10 @@ let storyResizeObserver;
 let storyListenersReady = false;
 let storyStart = 0;
 let storyEnd = 0;
+let scrollPromptTimer;
+let scrollPromptDismissTimer;
+let scrollPromptDismissed = false;
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function setText(id, text, fallback = "") {
   document.getElementById(id).textContent = text?.trim() || fallback;
@@ -285,6 +290,50 @@ function stopSmoothScroll() {
   smoothScrollTarget = window.scrollY;
 }
 
+function dismissScrollPrompt() {
+  scrollPromptDismissed = true;
+  window.clearTimeout(scrollPromptTimer);
+  window.clearTimeout(scrollPromptDismissTimer);
+  if (!scrollPrompt || scrollPrompt.hidden) return;
+  scrollPrompt.classList.remove("is-visible");
+  scrollPrompt.classList.add("is-dismissed");
+  scrollPrompt.disabled = true;
+  scrollPromptDismissTimer = window.setTimeout(() => {
+    scrollPrompt.hidden = true;
+  }, prefersReducedMotion.matches ? 20 : 420);
+}
+
+function startScrollPrompt() {
+  if (!scrollPrompt) return;
+  window.clearTimeout(scrollPromptTimer);
+  window.clearTimeout(scrollPromptDismissTimer);
+  scrollPromptDismissed = false;
+  scrollPrompt.hidden = true;
+  scrollPrompt.disabled = false;
+  scrollPrompt.classList.remove("is-visible", "is-dismissed");
+  scrollPromptTimer = window.setTimeout(() => {
+    if (card.hidden || scrollPromptDismissed || window.scrollY > 18) return;
+    scrollPrompt.hidden = false;
+    window.requestAnimationFrame(() => scrollPrompt.classList.add("is-visible"));
+  }, prefersReducedMotion.matches ? 950 : 1500);
+}
+
+function handleScrollPromptScroll() {
+  if (!card.hidden && !scrollPromptDismissed && !scrollPrompt?.hidden && window.scrollY > 18) dismissScrollPrompt();
+}
+
+scrollPrompt?.addEventListener("click", () => {
+  const target = card.querySelector(".countdown");
+  const targetTop = target
+    ? target.getBoundingClientRect().top + window.scrollY - 24
+    : window.scrollY + window.innerHeight * .78;
+  dismissScrollPrompt();
+  if (prefersReducedMotion.matches) window.scrollTo({ top: clampScroll(targetTop), behavior: "instant" });
+  else moveSmoothlyTo(targetTop);
+});
+
+window.addEventListener("scroll", handleScrollPromptScroll, { passive: true });
+
 function startSmoothScrolling() {
   if (smoothScrollingReady) return;
   smoothScrollingReady = true;
@@ -338,10 +387,13 @@ export function showWeddingCard({ keepPaper = false } = {}) {
   startCountdown();
   startSmoothScrolling();
   startStoryThread();
+  startScrollPrompt();
 }
 
 window.addEventListener("pagehide", () => {
   clearInterval(countdownInterval);
+  window.clearTimeout(scrollPromptTimer);
+  window.clearTimeout(scrollPromptDismissTimer);
   for (const timer of openingRevealTimers) window.clearTimeout(timer);
   revealObserver?.disconnect();
   storyResizeObserver?.disconnect();
@@ -353,6 +405,7 @@ window.addEventListener("pageshow", (event) => {
   if (card.hidden) return;
   startCountdown();
   startStoryThread();
+  if (!scrollPromptDismissed && window.scrollY <= 18) startScrollPrompt();
   if (event.persisted) {
     // Timers/observers were stopped on pagehide; never restore invisible content.
     for (const section of card.querySelectorAll(".reveal-on-scroll")) section.classList.add("is-revealed");
