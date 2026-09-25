@@ -956,6 +956,71 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   will-change: transform, opacity;
 }
 
+.music-toggle {
+  position: fixed;
+  z-index: 60;
+  left: max(15px, env(safe-area-inset-left));
+  bottom: max(15px, calc(env(safe-area-inset-bottom) + 10px));
+  display: grid;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid #b18c327a;
+  border-radius: 50%;
+  color: #8d681f;
+  background: #fff9f2df;
+  box-shadow: 0 8px 25px #67492d24, inset 0 0 0 4px #ffffff99;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: music-control-enter .7s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.music-toggle::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 1px solid #d0ae5c52;
+  border-radius: inherit;
+  opacity: 0;
+}
+
+.music-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 5px; }
+.music-toggle:active { transform: scale(.96); }
+
+.music-toggle__play {
+  width: 0;
+  height: 0;
+  margin-left: 3px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 11px solid currentColor;
+}
+
+.music-toggle__equalizer {
+  display: none;
+  height: 19px;
+  align-items: end;
+  gap: 3px;
+}
+
+.music-toggle__equalizer i {
+  width: 3px;
+  height: 7px;
+  border-radius: 3px;
+  background: currentColor;
+  animation: music-bar .85s ease-in-out infinite alternate;
+}
+
+.music-toggle__equalizer i:nth-child(2) { height: 15px; animation-delay: -.48s; }
+.music-toggle__equalizer i:nth-child(3) { height: 10px; animation-delay: -.22s; }
+.music-toggle[data-state="playing"] .music-toggle__play { display: none; }
+.music-toggle[data-state="playing"] .music-toggle__equalizer { display: flex; }
+.music-toggle[data-state="loading"] { cursor: wait; }
+.music-toggle[data-state="loading"] .music-toggle__play { opacity: .48; animation: music-loading 1s ease-in-out infinite alternate; }
+.music-toggle[data-state="blocked"]::after { opacity: 1; animation: music-attention 1.8s ease-out infinite; }
+
 .story-thread {
   position: absolute;
   z-index: 0;
@@ -1670,6 +1735,26 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   to { opacity: .52; transform: translate3d(var(--drift), 4px, 0) scale(1.18); }
 }
 
+@keyframes music-control-enter {
+  from { opacity: 0; transform: translateY(12px) scale(.86); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes music-bar {
+  from { transform: scaleY(.52); opacity: .65; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes music-loading {
+  from { opacity: .35; transform: scale(.88); }
+  to { opacity: .82; transform: scale(1.06); }
+}
+
+@keyframes music-attention {
+  0% { opacity: .8; transform: scale(.88); }
+  75%, 100% { opacity: 0; transform: scale(1.28); }
+}
+
 @keyframes portrait-petal-float {
   from { transform: translate3d(0, 3px, 0) rotate(var(--petal-rotation)) scale(.92); }
   to { transform: translate3d(var(--petal-x), var(--petal-y), 0) rotate(calc(var(--petal-rotation) + 16deg)) scale(1.04); }
@@ -1809,6 +1894,9 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   .card-particles,
   .portrait-petals { display: none; }
   .water-touch-effects { display: none; }
+  .music-toggle__equalizer i,
+  .music-toggle[data-state="loading"] .music-toggle__play,
+  .music-toggle[data-state="blocked"]::after { animation: none !important; }
   .story-thread__rail::after { height: 100% !important; opacity: .6; }
   .story-thread__marker { opacity: .72; transform: translate(-50%, -50%) rotate(45deg) scale(.9); }
   .paper.is-opening .swan--left,

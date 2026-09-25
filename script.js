@@ -8,13 +8,13 @@ const openingParticles = document.querySelector(".opening-particles");
 const waterTouchEffects = document.querySelector(".water-touch-effects");
 const cardParticles = document.querySelector(".card-particles");
 const invitationMusic = document.querySelector("#invitation-music");
+const musicToggle = document.querySelector("#music-toggle");
 const invitationApp = document.querySelector(".invitation-app");
 const loaderProgress = document.querySelector("#loader-progress");
 const loaderPercent = document.querySelector("#loader-percent");
 const musicStartAt = 3;
-const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+const musicTargetVolume = .68;
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-let musicBytesPromise;
 const criticalAssetUrls = [
   "./src/assets/swan-lake-background-mobile.jpg",
   "./src/assets/white-swan-mobile.png",
@@ -128,15 +128,6 @@ paper.addEventListener("pointerdown", (event) => {
   createWaterRipple(event.clientX, event.clientY);
 }, { passive: true });
 
-function loadMusicBytes() {
-  if (!invitationMusic || !AudioContextClass) return null;
-  musicBytesPromise ||= fetch(invitationMusic.src).then((response) => {
-      if (!response.ok) throw new Error("The invitation music could not be loaded.");
-      return response.arrayBuffer();
-    });
-  return musicBytesPromise;
-}
-
 function preloadImage(url) {
   return new Promise((resolve) => {
     const image = new Image();
@@ -188,85 +179,149 @@ async function prepareInvitation() {
 }
 
 const invitationReady = prepareInvitation();
-let musicFadeFrame;
-let bufferedMusicStarted = false;
+let musicFadeTimer;
+let musicPlayPending;
+let musicStartedAtOpening = false;
+let musicEverPlayed = false;
 
-function fadeMusicIn(targetVolume = .68, duration = 2200) {
-  if (musicFadeFrame) cancelAnimationFrame(musicFadeFrame);
-  const startedAt = performance.now();
-
-  const step = (now) => {
-    const progress = Math.min(1, (now - startedAt) / duration);
-    invitationMusic.volume = targetVolume * (1 - Math.pow(1 - progress, 3));
-    if (progress < 1) musicFadeFrame = requestAnimationFrame(step);
-  };
-
-  musicFadeFrame = requestAnimationFrame(step);
+function setMusicControl(state) {
+  if (!musicToggle) return;
+  const playing = state === "playing";
+  musicToggle.dataset.state = state;
+  musicToggle.setAttribute("aria-pressed", String(playing));
+  musicToggle.setAttribute("aria-label", playing ? "توقف موسیقی" : state === "loading" ? "در حال آماده‌سازی موسیقی" : "پخش موسیقی");
+  musicToggle.title = playing ? "توقف موسیقی" : "پخش موسیقی";
 }
 
-function startHtmlInvitationMusic() {
-  if (!invitationMusic || !invitationMusic.paused) return;
-  invitationMusic.dataset.playbackEngine = "html-audio";
+function revealMusicControl() {
+  if (!musicToggle) return;
+  musicToggle.hidden = false;
+  setMusicControl(invitationMusic && !invitationMusic.paused ? "playing" : invitationMusic?.dataset.playbackStatus === "blocked" ? "blocked" : "paused");
+}
 
-  const seekToOpening = () => {
-    try { invitationMusic.currentTime = musicStartAt; } catch { /* Metadata is still loading. */ }
+function seekToMusicOpening() {
+  if (musicStartedAtOpening || !invitationMusic || invitationMusic.readyState < HTMLMediaElement.HAVE_METADATA) return musicStartedAtOpening;
+  try {
+    const latestStart = Number.isFinite(invitationMusic.duration) ? Math.max(0, invitationMusic.duration - .1) : musicStartAt;
+    invitationMusic.currentTime = Math.min(musicStartAt, latestStart);
+    invitationMusic.dataset.startedAt = String(invitationMusic.currentTime);
+    invitationMusic.dataset.duration = String(invitationMusic.duration);
+    musicStartedAtOpening = true;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function fadeMusicIn(targetVolume = musicTargetVolume, duration = 2200) {
+  if (musicFadeTimer) clearInterval(musicFadeTimer);
+  const startedAt = performance.now();
+  const audibleFloor = Math.min(.12, targetVolume);
+  invitationMusic.volume = audibleFloor;
+
+  const step = () => {
+    const now = performance.now();
+    const progress = Math.min(1, (now - startedAt) / duration);
+    invitationMusic.volume = audibleFloor + (targetVolume - audibleFloor) * (1 - Math.pow(1 - progress, 3));
+    if (progress >= 1) {
+      clearInterval(musicFadeTimer);
+      musicFadeTimer = undefined;
+    }
   };
 
-  invitationMusic.volume = 0;
-  if (invitationMusic.readyState >= HTMLMediaElement.HAVE_METADATA) seekToOpening();
-  else invitationMusic.addEventListener("loadedmetadata", seekToOpening, { once: true });
-  invitationMusic.addEventListener("playing", () => {
-    if (invitationMusic.currentTime < musicStartAt) seekToOpening();
-  }, { once: true });
+  musicFadeTimer = window.setInterval(step, 80);
+}
 
-  const playback = invitationMusic.play();
-  if (playback) {
-    playback
-      .then(() => {
-        if (invitationMusic.currentTime < musicStartAt) seekToOpening();
-        for (const delay of [120, 480, 900]) {
-          window.setTimeout(() => {
-            if (invitationMusic.currentTime < musicStartAt) seekToOpening();
-          }, delay);
-        }
-        fadeMusicIn();
-      })
-      .catch(() => undefined);
+function playInvitationMusic({ fade = !musicEverPlayed } = {}) {
+  if (!invitationMusic) return Promise.resolve(false);
+  if (!invitationMusic.paused) {
+    setMusicControl("playing");
+    return Promise.resolve(true);
   }
+  if (musicPlayPending) return musicPlayPending;
+
+  invitationMusic.dataset.playbackEngine = "html-audio";
+  invitationMusic.dataset.playbackStatus = "starting";
+  setMusicControl("loading");
+
+  const startingAtOpening = !musicStartedAtOpening;
+  invitationMusic.volume = fade ? 0 : musicTargetVolume;
+
+  // Keep play() in the synchronous user-gesture call stack for Safari and in-app browsers.
+  const playback = invitationMusic.play();
+  if (!playback) {
+    invitationMusic.addEventListener("playing", () => {
+      if (startingAtOpening) seekToMusicOpening();
+      invitationMusic.dataset.playbackStatus = "playing";
+      musicEverPlayed = true;
+      setMusicControl("playing");
+      if (fade) fadeMusicIn();
+    }, { once: true });
+    return Promise.resolve(true);
+  }
+
+  musicPlayPending = playback
+    .then(() => {
+      if (startingAtOpening) seekToMusicOpening();
+      invitationMusic.dataset.playbackStatus = "playing";
+      invitationMusic.dataset.playbackError = "";
+      musicEverPlayed = true;
+      setMusicControl("playing");
+      if (fade) fadeMusicIn();
+      else invitationMusic.volume = musicTargetVolume;
+      return true;
+    })
+    .catch((error) => {
+      invitationMusic.dataset.playbackStatus = "blocked";
+      invitationMusic.dataset.playbackError = error?.name || "PLAYBACK_FAILED";
+      invitationMusic.volume = musicTargetVolume;
+      setMusicControl("blocked");
+      return false;
+    })
+    .finally(() => {
+      musicPlayPending = undefined;
+    });
+
+  return musicPlayPending;
 }
 
 function startInvitationMusic() {
-  const bytesPromise = loadMusicBytes();
-  if (!AudioContextClass || !bytesPromise || bufferedMusicStarted) {
-    startHtmlInvitationMusic();
+  void playInvitationMusic();
+}
+
+musicToggle?.addEventListener("click", () => {
+  if (!invitationMusic) return;
+  if (invitationMusic.paused) {
+    void playInvitationMusic({ fade: false });
     return;
   }
+  if (musicFadeTimer) clearInterval(musicFadeTimer);
+  musicFadeTimer = undefined;
+  invitationMusic.pause();
+  invitationMusic.dataset.playbackStatus = "paused";
+  setMusicControl("paused");
+});
 
-  bufferedMusicStarted = true;
-  const context = new AudioContextClass();
-  const resumePlayback = context.resume();
+invitationMusic?.addEventListener("playing", () => {
+  invitationMusic.dataset.playbackStatus = "playing";
+  setMusicControl("playing");
+});
 
-  Promise.all([resumePlayback, bytesPromise])
-    .then(([, bytes]) => context.decodeAudioData(bytes.slice(0)))
-    .then((buffer) => {
-      const source = context.createBufferSource();
-      const gain = context.createGain();
-      const now = context.currentTime;
+invitationMusic?.addEventListener("pause", () => {
+  if (!invitationMusic.ended) setMusicControl("paused");
+});
 
-      source.buffer = buffer;
-      source.connect(gain).connect(context.destination);
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(.68, now + 2.2);
-      source.start(0, Math.min(musicStartAt, Math.max(0, buffer.duration - .1)));
-      invitationMusic.dataset.playbackEngine = "web-audio";
-      invitationMusic.dataset.startedAt = String(musicStartAt);
-      invitationMusic.dataset.duration = String(buffer.duration);
-    })
-    .catch(() => {
-      bufferedMusicStarted = false;
-      startHtmlInvitationMusic();
-    });
-}
+invitationMusic?.addEventListener("ended", () => {
+  musicStartedAtOpening = false;
+  invitationMusic.dataset.playbackStatus = "ended";
+  setMusicControl("paused");
+});
+
+invitationMusic?.addEventListener("error", () => {
+  invitationMusic.dataset.playbackStatus = "blocked";
+  invitationMusic.dataset.playbackError = invitationMusic.error?.message || "MEDIA_ERROR";
+  setMusicControl("blocked");
+});
 
 const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 
@@ -275,6 +330,7 @@ async function invitationOpened() {
   paper.setAttribute("aria-busy", "true");
   document.documentElement.classList.add("invitation-is-transitioning");
   showWeddingCard({ keepPaper: true });
+  revealMusicControl();
   paper.classList.add("is-departing");
 
   // Crossfade the completed swan scene over the entering card.
@@ -353,4 +409,9 @@ paper.addEventListener("click", (event) => {
 });
 
 // Skip the swan opening when a direct link targets the full card.
-if (window.location.hash === "#wedding-card") void invitationReady.then(showWeddingCard);
+if (window.location.hash === "#wedding-card") {
+  void invitationReady.then(() => {
+    showWeddingCard();
+    revealMusicControl();
+  });
+}
