@@ -30,6 +30,17 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\serve.ps1
 
 سرور با Node.js اجرا می‌شود و برای بانک اطلاعاتی از SQLite داخلی Node استفاده می‌کند؛ نصب پکیج یا مرحلهٔ build لازم نیست.
 
+## اجرای نسخهٔ عمومی با Docker
+
+ایمیج عمومی GitHub Container Registry همان نسخهٔ استاتیک GitHub Pages را ارائه می‌کند و شامل پنل مدیریت یا بانک اطلاعاتی مهمان‌ها نیست:
+
+```bash
+docker pull ghcr.io/mertz1999/wedding-reza:latest
+docker run --rm -p 8080:8080 ghcr.io/mertz1999/wedding-reza:latest
+```
+
+سپس `http://localhost:8080` را باز کنید. مسیر `GET /healthz` برای health check در دسترس است. ایمیج برای هر دو معماری `linux/amd64` و `linux/arm64` منتشر می‌شود.
+
 پنل مدیریت فقط روی همین رایانه در آدرس زیر در دسترس است:
 
 `http://localhost:4173/admin`
