@@ -1,4 +1,4 @@
-import { wedding } from "./wedding-config.js";
+import { wedding } from "./wedding-config.js?v=20260929-1";
 import { getGuestName, getWeddingTimestamp, getCountdown, getNeshanUrl } from "./invitation-data.js";
 
 const card = document.querySelector("#wedding-card");
@@ -163,7 +163,7 @@ function startCountdown() {
 }
 
 function startScrollReveals() {
-  const sections = [...card.querySelectorAll(".guest, .hero-cutout, .countdown, .couple, .celebration, .rsvp, .card-footer, .venue-finale")];
+  const sections = [...card.querySelectorAll(".guest, .hero-cutout, .countdown, .couple, .celebration, .rsvp, .card-footer")];
   const guest = card.querySelector(".guest");
   const hero = card.querySelector(".hero-cutout");
   const openingSections = new Set([guest, hero]);
