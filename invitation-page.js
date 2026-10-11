@@ -1,4 +1,4 @@
-import { wedding } from "./wedding-config.js?v=20260929-1";
+import { wedding } from "./wedding-config.js?v=20261011-1";
 import { getGuestName, getWeddingTimestamp, getCountdown, getNeshanUrl } from "./invitation-data.js";
 
 const card = document.querySelector("#wedding-card");
@@ -58,7 +58,7 @@ if (timestamp !== null) {
     ...options, weekday: "long", day: "numeric", month: "long", year: "numeric",
   }).formatToParts(date);
   const part = (type) => dateParts.find((item) => item.type === type)?.value || "";
-  dateElement.textContent = `${part("weekday")}، ${part("day")} ${part("month")} ${part("year")}`;
+  dateElement.textContent = wedding.dateDisplay?.trim() || `${part("weekday")}، ${part("day")} ${part("month")} ${part("year")}`;
   setText("wedding-time", hasCeremonyTime ? `ساعت ${new Intl.DateTimeFormat("fa-IR", { ...options, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(date)}` : "ساعت مراسم به‌زودی اعلام می‌شود");
   setText("countdown-heading", hasCeremonyTime ? "تا آغازِ جشن عروسی‌مان" : "تا روزِ عروسی‌مان");
 }
@@ -163,7 +163,7 @@ function startCountdown() {
 }
 
 function startScrollReveals() {
-  const sections = [...card.querySelectorAll(".guest, .hero-cutout, .countdown, .couple, .celebration, .rsvp, .card-footer")];
+  const sections = [...card.querySelectorAll(".guest, .hero-cutout, .countdown, .couple, .celebration, .rsvp, .card-footer, .venue-finale")];
   const guest = card.querySelector(".guest");
   const hero = card.querySelector(".hero-cutout");
   const openingSections = new Set([guest, hero]);
@@ -171,7 +171,7 @@ function startScrollReveals() {
     section.classList.add("reveal-on-scroll");
     if (section.classList.contains("couple")) continue;
 
-    const textItems = [...section.querySelectorAll("h1, h2, p, time, .countdown__digits, .location-link, .rsvp__choice, .card-flourish, .celebration__date > svg, .celebration__venue > svg, .rsvp__mark, :scope > span")]
+    const textItems = [...section.querySelectorAll("h1, h2, p, time, .countdown__digits, .venue-map, .location-link, .rsvp__choice, .card-flourish, .celebration__date > svg, .celebration__venue > svg, .rsvp__mark, :scope > span")]
       .filter((item) => !item.classList.contains("orchid-decor"));
     for (const [index, item] of textItems.entries()) {
       item.classList.add("reveal-item");
