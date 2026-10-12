@@ -1,0 +1,30 @@
+# Self-contained Chabokan build: this Dockerfile does not require a source context.
+# Before opening /admin, configure ADMIN_USERNAME and ADMIN_PASSWORD in Chabokan.
+# Attach a persistent disk to /app/data so SQLite data survives redeployments.
+FROM node:24-alpine
+
+RUN apk add --no-cache git
+
+ARG REPOSITORY_URL=https://github.com/mertz1999/wedding-reza.git
+ARG REPOSITORY_REF=main
+
+RUN git clone --depth 1 --branch "${REPOSITORY_REF}" "${REPOSITORY_URL}" /app \
+    && rm -rf /app/.git \
+    && mkdir -p /app/data \
+    && chown -R node:node /app
+
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    HOST=0.0.0.0 \
+    PORT=80
+
+USER node
+
+VOLUME ["/app/data"]
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:80/healthz >/dev/null || exit 1
+
+CMD ["node", "server.mjs"]

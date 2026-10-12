@@ -1,12 +1,15 @@
 import { createServer } from "node:http";
 import { createReadStream, existsSync, mkdirSync, statSync } from "node:fs";
-import { extname, join, normalize, resolve } from "node:path";
+import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomBytes } from "node:crypto";
+import { randomBytes, timingSafeEqual } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const port = Number.parseInt(process.env.PORT || "4173", 10);
+const host = process.env.HOST?.trim() || "127.0.0.1";
+const adminUsername = process.env.ADMIN_USERNAME?.trim() || "";
+const adminPassword = process.env.ADMIN_PASSWORD || "";
 const dataDirectory = join(root, "data");
 mkdirSync(dataDirectory, { recursive: true });
 
@@ -83,9 +86,61 @@ function sendError(response, status, message) {
   sendJson(response, status, { error: message });
 }
 
+function isLoopbackHost(value) {
+  return value === "localhost" || value === "127.0.0.1" || value === "::1";
+}
+
+function safeEqual(actual, expected) {
+  const actualBuffer = Buffer.from(actual);
+  const expectedBuffer = Buffer.from(expected);
+  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer);
+}
+
+function hasRemoteAdminCredentials() {
+  return Boolean(adminUsername && adminPassword);
+}
+
 function isLocalAdminRequest(request) {
-  const host = (request.headers.host || "").toLowerCase().replace(/^\[|\]$/g, "").split(":")[0];
-  return host === "localhost" || host === "127.0.0.1" || host === "::1";
+  if (!isLoopbackHost(host)) return false;
+  const requestedHost = (request.headers.host || "").toLowerCase().replace(/^\[|\]$/g, "").split(":")[0];
+  return isLoopbackHost(requestedHost);
+}
+
+function isAuthorizedAdminRequest(request) {
+  if (isLocalAdminRequest(request)) return true;
+  if (!hasRemoteAdminCredentials()) return false;
+
+  const authorization = request.headers.authorization || "";
+  const match = authorization.match(/^Basic\s+(.+)$/i);
+  if (!match) return false;
+
+  let decoded;
+  try {
+    decoded = Buffer.from(match[1], "base64").toString("utf8");
+  } catch {
+    return false;
+  }
+  const separator = decoded.indexOf(":");
+  if (separator < 0) return false;
+  return safeEqual(decoded.slice(0, separator), adminUsername)
+    && safeEqual(decoded.slice(separator + 1), adminPassword);
+}
+
+function sendAdminDenied(response) {
+  if (!hasRemoteAdminCredentials()) {
+    sendError(response, 403, "برای دسترسی راه دور به پنل مدیریت، نام کاربری و رمز عبور مدیر را تنظیم کنید.");
+    return;
+  }
+
+  const body = Buffer.from(JSON.stringify({ error: "نام کاربری یا رمز عبور مدیریت صحیح نیست." }));
+  response.writeHead(401, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": body.length,
+    "Cache-Control": "no-store",
+    "WWW-Authenticate": 'Basic realm="Wedding Admin", charset="UTF-8"',
+    "X-Content-Type-Options": "nosniff",
+  });
+  response.end(body);
 }
 
 async function readJson(request) {
@@ -136,7 +191,7 @@ function serveFile(response, pathname) {
     return;
   }
   const filePath = resolve(root, relative);
-  const rootPrefix = resolve(root).replace(/[\\/]$/, "") + "\\";
+  const rootPrefix = resolve(root).replace(/[\\/]$/, "") + sep;
   if (!filePath.startsWith(rootPrefix) || !existsSync(filePath) || !statSync(filePath).isFile()) {
     sendError(response, 404, "فایل پیدا نشد.");
     return;
@@ -155,8 +210,8 @@ function serveFile(response, pathname) {
 
 async function handleApi(request, response, pathname) {
   if (pathname.startsWith("/api/admin/")) {
-    if (!isLocalAdminRequest(request)) {
-      sendError(response, 403, "پنل مدیریت فقط روی همین رایانه در دسترس است.");
+    if (!isAuthorizedAdminRequest(request)) {
+      sendAdminDenied(response);
       return;
     }
 
@@ -242,8 +297,20 @@ const server = createServer(async (request, response) => {
     const pathname = url.pathname;
     const decodedPathname = decodeURIComponent(pathname);
 
-    if ((decodedPathname === "/admin" || decodedPathname === "/admin/" || decodedPathname === "/admin.html" || decodedPathname === "/admin.css" || decodedPathname === "/admin.js") && !isLocalAdminRequest(request)) {
-      sendError(response, 403, "پنل مدیریت فقط روی همین رایانه در دسترس است.");
+    if (pathname === "/healthz") {
+      const body = Buffer.from("ok\n");
+      response.writeHead(200, {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Length": body.length,
+        "Cache-Control": "no-store",
+      });
+      if (request.method !== "HEAD") response.end(body);
+      else response.end();
+      return;
+    }
+
+    if ((decodedPathname === "/admin" || decodedPathname === "/admin/" || decodedPathname === "/admin.html" || decodedPathname === "/admin.css" || decodedPathname === "/admin.js") && !isAuthorizedAdminRequest(request)) {
+      sendAdminDenied(response);
       return;
     }
 
@@ -267,9 +334,9 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`Wedding invitation: http://localhost:${port}/`);
-  console.log(`Guest manager: http://localhost:${port}/admin`);
+server.listen(port, host, () => {
+  console.log(`Wedding invitation listening on http://${host}:${port}/`);
+  console.log(`Guest manager: http://${host}:${port}/admin`);
 });
 
 function close() {

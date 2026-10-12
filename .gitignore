@@ -3,5 +3,6 @@ pages-dist/
 *.log
 *.sqlite-shm
 *.sqlite-wal
+data/*.sqlite
 .DS_Store
 Thumbs.db
