@@ -7,6 +7,7 @@ const storyThread = card.querySelector(".story-thread");
 const storyMarkers = [...card.querySelectorAll(".story-thread__marker")];
 const scrollPrompt = document.querySelector("#scroll-prompt");
 const guestHeading = document.querySelector("#guest-heading");
+const guestCompanions = document.querySelector("#guest-companions");
 const status = document.querySelector("#countdown-status");
 const hasCeremonyTime = getWeddingTimestamp(wedding.startsAt) !== null;
 const eventDate = hasCeremonyTime ? wedding.startsAt : wedding.date ? `${wedding.date}T00:00:00+03:30` : "";
@@ -113,6 +114,7 @@ async function hydrateInvitation() {
     guestName = invitation.guestName;
     rsvpStorageKey = `wedding-rsvp:v1:${wedding.date || "undated"}:${invitationToken}`;
     setText("guest-name", guestName, "مهمان گرامی");
+    guestCompanions.hidden = invitation.includeCompanions === false;
     document.title = `دعوت‌نامهٔ ${guestName}`;
     if (invitation.rsvpStatus) setRsvp(invitation.rsvpStatus, { save: false });
   } catch {
@@ -381,7 +383,9 @@ export function showWeddingCard({ keepPaper = false } = {}) {
   document.documentElement.classList.add("card-is-visible");
   card.hidden = false;
   document.querySelector(".paper").hidden = !keepPaper;
-  document.title = wedding.bride && wedding.groom ? `جشن عروسی ${wedding.bride} و ${wedding.groom}` : "کارت دعوت عروسی ما";
+  if (!invitationToken) {
+    document.title = wedding.bride && wedding.groom ? `جشن عروسی ${wedding.bride} و ${wedding.groom}` : "کارت دعوت عروسی ما";
+  }
   window.scrollTo(0, 0);
   guestHeading.focus({ preventScroll: true });
   startCountdown();

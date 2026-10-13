@@ -22,6 +22,7 @@ database.exec(`
     token TEXT NOT NULL UNIQUE,
     guest_name TEXT NOT NULL,
     phone TEXT,
+    include_companions INTEGER NOT NULL DEFAULT 1 CHECK (include_companions IN (0, 1)),
     created_at TEXT NOT NULL,
     first_viewed_at TEXT,
     last_viewed_at TEXT,
@@ -35,10 +36,17 @@ database.exec(`
   CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token);
 `);
 
+const invitationColumns = database.prepare("PRAGMA table_info(invitations)").all();
+if (!invitationColumns.some((column) => column.name === "include_companions")) {
+  database.exec("ALTER TABLE invitations ADD COLUMN include_companions INTEGER NOT NULL DEFAULT 1 CHECK (include_companions IN (0, 1))");
+}
+
 const statements = {
   list: database.prepare(`SELECT * FROM invitations ORDER BY id DESC`),
   find: database.prepare(`SELECT * FROM invitations WHERE token = ?`),
-  insert: database.prepare(`INSERT INTO invitations (token, guest_name, phone, created_at) VALUES (?, ?, ?, ?)`),
+  findById: database.prepare(`SELECT * FROM invitations WHERE id = ?`),
+  insert: database.prepare(`INSERT INTO invitations (token, guest_name, phone, include_companions, created_at) VALUES (?, ?, ?, ?, ?)`),
+  update: database.prepare(`UPDATE invitations SET guest_name = ?, phone = ?, include_companions = ? WHERE id = ?`),
   viewed: database.prepare(`
     UPDATE invitations SET
       first_viewed_at = COALESCE(first_viewed_at, ?),
@@ -164,6 +172,7 @@ function serializeInvitation(row, includePrivate = false) {
     id: row.id,
     token: row.token,
     guestName: row.guest_name,
+    includeCompanions: row.include_companions !== 0,
     createdAt: row.created_at,
     firstViewedAt: row.first_viewed_at,
     lastViewedAt: row.last_viewed_at,
@@ -224,13 +233,34 @@ async function handleApi(request, response, pathname) {
       const body = await readJson(request);
       const guestName = cleanText(body.guestName, 120);
       const phone = cleanText(body.phone, 32) || null;
+      const includeCompanions = body.includeCompanions !== false ? 1 : 0;
       if (!guestName) {
         sendError(response, 400, "نام مهمان الزامی است.");
         return;
       }
       const token = randomBytes(18).toString("base64url");
-      statements.insert.run(token, guestName, phone, new Date().toISOString());
+      statements.insert.run(token, guestName, phone, includeCompanions, new Date().toISOString());
       sendJson(response, 201, { invitation: serializeInvitation(statements.find.get(token), true) });
+      return;
+    }
+
+    const updateMatch = pathname.match(/^\/api\/admin\/invitations\/(\d+)$/);
+    if (updateMatch && request.method === "PATCH") {
+      const id = Number(updateMatch[1]);
+      if (!statements.findById.get(id)) {
+        sendError(response, 404, "مهمان پیدا نشد.");
+        return;
+      }
+      const body = await readJson(request);
+      const guestName = cleanText(body.guestName, 120);
+      const phone = cleanText(body.phone, 32) || null;
+      const includeCompanions = body.includeCompanions !== false ? 1 : 0;
+      if (!guestName) {
+        sendError(response, 400, "نام مهمان الزامی است.");
+        return;
+      }
+      statements.update.run(guestName, phone, includeCompanions, id);
+      sendJson(response, 200, { invitation: serializeInvitation(statements.findById.get(id), true) });
       return;
     }
 

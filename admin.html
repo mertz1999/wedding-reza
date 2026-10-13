@@ -27,8 +27,8 @@
 
       <div class="admin-layout">
         <aside class="create-panel">
-          <h2>ساخت لینک دعوت جدید</h2>
-          <p>برای هر مهمان یک لینک امن و اختصاصی بسازید.</p>
+          <h2 id="form-heading">ساخت لینک دعوت جدید</h2>
+          <p id="form-description">برای هر مهمان یک لینک امن و اختصاصی بسازید.</p>
           <form id="guest-form">
             <label for="guest-name">نام مهمان</label>
             <input id="guest-name" name="guestName" required maxlength="120" autocomplete="off" placeholder="مثلاً: آقای احمدی و خانواده">
@@ -36,17 +36,25 @@
             <label for="guest-phone">شماره تلفن <small>(اختیاری)</small></label>
             <input id="guest-phone" name="phone" maxlength="32" inputmode="tel" autocomplete="tel" placeholder="مثلاً: ۰۹۱۲۱۲۳۴۵۶۷">
 
+            <label class="checkbox-field" for="guest-companions">
+              <input id="guest-companions" name="includeCompanions" type="checkbox" checked>
+              <span>نمایش «به همراه خانوادهٔ محترم» روی کارت</span>
+            </label>
+
             <label for="public-base">آدرس عمومی سایت</label>
             <input id="public-base" name="publicBase" type="url" inputmode="url" dir="ltr" placeholder="https://example.ngrok-free.dev">
             <p class="field-note">برای لینک قابل ارسال، آدرس ngrok را اینجا قرار دهید.</p>
 
-            <button class="primary-button" type="submit">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg>
-              ساخت لینک اختصاصی
-            </button>
+            <div class="form-actions">
+              <button class="primary-button" type="submit">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg>
+                <span id="submit-label">ساخت لینک اختصاصی</span>
+              </button>
+              <button class="secondary-button" id="cancel-edit" type="button" hidden>انصراف از ویرایش</button>
+            </div>
           </form>
           <div class="created-link" id="created-link" hidden>
-            <p>لینک مهمان آماده شد</p>
+            <p id="created-link-label">لینک مهمان آماده شد</p>
             <div><input id="created-link-value" readonly dir="ltr"><button type="button" id="copy-created-link">کپی</button></div>
           </div>
         </aside>
@@ -62,7 +70,7 @@
 
           <div class="table-wrap">
             <table>
-              <thead><tr><th>نام مهمان</th><th>شماره تلفن</th><th>بازشدن لینک</th><th>بازشدن کارت</th><th>پاسخ حضور</th><th>آخرین فعالیت</th><th>لینک دعوت</th><th><span class="sr-only">عملیات</span></th></tr></thead>
+              <thead><tr><th>نام مهمان</th><th>خانواده</th><th>شماره تلفن</th><th>بازشدن لینک</th><th>بازشدن کارت</th><th>پاسخ حضور</th><th>آخرین فعالیت</th><th>لینک دعوت</th><th><span class="sr-only">عملیات</span></th></tr></thead>
               <tbody id="guest-rows"></tbody>
             </table>
             <div class="empty-state" id="empty-state" hidden>
@@ -73,6 +81,6 @@
       </div>
     </main>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script type="module" src="./admin.js"></script>
+    <script type="module" src="./admin.js?v=20261013-2"></script>
   </body>
 </html>
