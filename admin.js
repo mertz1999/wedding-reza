@@ -4,6 +4,7 @@ const form = document.querySelector("#guest-form");
 const rows = document.querySelector("#guest-rows");
 const emptyState = document.querySelector("#empty-state");
 const search = document.querySelector("#guest-search");
+const exportGuests = document.querySelector("#export-guests");
 const baseInput = document.querySelector("#public-base");
 const guestNameInput = document.querySelector("#guest-name");
 const guestPhoneInput = document.querySelector("#guest-phone");
@@ -68,6 +69,80 @@ function invitationMessage(invitation) {
 
 function formatDate(value) {
   return value ? dateTime.format(new Date(value)) : "—";
+}
+
+function rsvpLabel(status) {
+  if (status === "yes") return "شرکت می‌کنند";
+  if (status === "no") return "شرکت نمی‌کنند";
+  return "بدون پاسخ";
+}
+
+function escapeXml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+function excelCell(value, { type = "String", style = "Cell", href = "" } = {}) {
+  const link = href ? ` ss:HRef="${escapeXml(href)}"` : "";
+  return `<Cell ss:StyleID="${style}"${link}><Data ss:Type="${type}">${escapeXml(value)}</Data></Cell>`;
+}
+
+function exportInvitations() {
+  if (!invitations.length) {
+    showToast("هنوز مهمانی برای خروجی گرفتن وجود ندارد.", true);
+    return;
+  }
+
+  const headers = ["ردیف", "نام مهمان", "همراه خانواده", "شماره تلفن", "بازشدن لینک", "بازشدن کارت", "پاسخ حضور", "تاریخ ساخت", "آخرین فعالیت", "لینک دعوت"];
+  const headerRow = `<Row>${headers.map((header) => excelCell(header, { style: "Header" })).join("")}</Row>`;
+  const dataRows = invitations.map((invitation, index) => {
+    const link = inviteUrl(invitation.token);
+    const lastActivity = invitation.rsvpUpdatedAt || invitation.lastCardOpenedAt || invitation.lastViewedAt || invitation.createdAt;
+    return `<Row>${[
+      excelCell(index + 1, { type: "Number" }),
+      excelCell(invitation.guestName),
+      excelCell(invitation.includeCompanions ? "بله" : "خیر"),
+      excelCell(invitation.phone || ""),
+      excelCell(invitation.viewCount || 0, { type: "Number" }),
+      excelCell(invitation.cardOpenCount || 0, { type: "Number" }),
+      excelCell(rsvpLabel(invitation.rsvpStatus)),
+      excelCell(formatDate(invitation.createdAt)),
+      excelCell(formatDate(lastActivity)),
+      excelCell(link, { style: "Link", href: link }),
+    ].join("")}</Row>`;
+  }).join("");
+
+  const workbook = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Title>فهرست مهمان‌های عروسی ${escapeXml(wedding.bride)} و ${escapeXml(wedding.groom)}</Title></DocumentProperties>
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:ReadingOrder="RightToLeft"/><Font ss:FontName="Tahoma" ss:Size="11"/></Style>
+    <Style ss:ID="Cell"><Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:ReadingOrder="RightToLeft"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E9DDE0"/></Borders></Style>
+    <Style ss:ID="Header"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:ReadingOrder="RightToLeft"/><Font ss:FontName="Tahoma" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#9F7427" ss:Pattern="Solid"/></Style>
+    <Style ss:ID="Link"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:FontName="Tahoma" ss:Size="10" ss:Color="#356580" ss:Underline="Single"/></Style>
+  </Styles>
+  <Worksheet ss:Name="مهمان‌ها"><Table ss:DefaultRowHeight="24">
+    <Column ss:Width="45"/><Column ss:Width="180"/><Column ss:Width="90"/><Column ss:Width="100"/><Column ss:Width="85"/><Column ss:Width="85"/><Column ss:Width="100"/><Column ss:Width="145"/><Column ss:Width="145"/><Column ss:Width="260"/>
+    ${headerRow}${dataRows}
+  </Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><DisplayRightToLeft/><FreezePanes/><FrozenNoSplit/><SplitHorizontal>1</SplitHorizontal><TopRowBottomPane>1</TopRowBottomPane><ProtectObjects>False</ProtectObjects><ProtectScenarios>False</ProtectScenarios></WorksheetOptions></Worksheet>
+</Workbook>`;
+
+  const blob = new Blob(["\ufeff", workbook], { type: "application/vnd.ms-excel;charset=utf-8" });
+  const objectUrl = URL.createObjectURL(blob);
+  const download = document.createElement("a");
+  const date = (wedding.dateDisplay || new Date().toISOString().slice(0, 10)).replaceAll("/", "-");
+  download.href = objectUrl;
+  download.download = `wedding-guests-${date}.xls`;
+  document.body.append(download);
+  download.click();
+  download.remove();
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  showToast("فایل اکسل مهمان‌ها دانلود شد.");
 }
 
 function statusElement(invitation) {
@@ -165,6 +240,7 @@ function renderSummary() {
   document.querySelector("#viewed-count").textContent = number.format(invitations.filter((item) => item.viewCount > 0).length);
   document.querySelector("#yes-count").textContent = number.format(invitations.filter((item) => item.rsvpStatus === "yes").length);
   document.querySelector("#no-count").textContent = number.format(invitations.filter((item) => item.rsvpStatus === "no").length);
+  exportGuests.disabled = invitations.length === 0;
 }
 
 async function loadInvitations({ quiet = false } = {}) {
@@ -259,6 +335,7 @@ form.addEventListener("submit", async (event) => {
 });
 
 copyCreated.addEventListener("click", () => copyText(createdValue.value).catch(() => showToast("کپی لینک انجام نشد.", true)));
+exportGuests.addEventListener("click", exportInvitations);
 cancelEdit.addEventListener("click", () => resetFormMode());
 search.addEventListener("input", renderRows);
 loadInvitations();

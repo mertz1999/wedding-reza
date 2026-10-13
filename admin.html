@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#f7e3e9">
     <meta name="robots" content="noindex,nofollow">
     <title>مدیریت مهمان‌ها</title>
-    <link rel="stylesheet" href="./admin.css">
+    <link rel="stylesheet" href="./admin.css?v=20261013-3">
   </head>
   <body>
     <main class="admin-shell">
@@ -62,10 +62,16 @@
         <section class="guest-panel">
           <div class="guest-panel__header">
             <div><h2>فهرست مهمان‌ها</h2><p>آخرین وضعیت بازشدن کارت و پاسخ حضور</p></div>
-            <label class="search-box">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-              <input id="guest-search" type="search" placeholder="جستجو در نام یا شماره تلفن…">
-            </label>
+            <div class="guest-panel__controls">
+              <button class="export-button" id="export-guests" type="button" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
+                <span>دانلود اکسل</span>
+              </button>
+              <label class="search-box">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input id="guest-search" type="search" placeholder="جستجو در نام یا شماره تلفن…">
+              </label>
+            </div>
           </div>
 
           <div class="table-wrap">
@@ -81,6 +87,6 @@
       </div>
     </main>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script type="module" src="./admin.js?v=20261013-2"></script>
+    <script type="module" src="./admin.js?v=20261013-3"></script>
   </body>
 </html>
