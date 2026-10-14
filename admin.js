@@ -20,6 +20,7 @@ const copyCreated = document.querySelector("#copy-created-link");
 const toast = document.querySelector("#toast");
 const number = new Intl.NumberFormat("fa-IR");
 const dateTime = new Intl.DateTimeFormat("fa-IR", { dateStyle: "medium", timeStyle: "short" });
+const tableLabels = ["نام مهمان", "همراه خانواده", "شماره تلفن", "بازشدن لینک", "بازشدن کارت", "پاسخ حضور", "آخرین فعالیت", "لینک دعوت", "عملیات"];
 let invitations = [];
 let editingInvitationId = null;
 let toastTimer;
@@ -231,6 +232,9 @@ function renderRows() {
     remove.addEventListener("click", () => removeInvitation(invitation));
     actionCell.append(edit, remove);
     tr.append(actionCell);
+    [...tr.children].forEach((tableCell, index) => {
+      tableCell.dataset.label = tableLabels[index];
+    });
     rows.append(tr);
   }
 }
