@@ -1514,6 +1514,58 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
 .celebration h2 { margin: 12px 0; color: var(--ink); font-size: 24px; font-weight: 500; line-height: 2; }
 .celebration time { display: block; font-size: 20px; line-height: 2.2; }
 .celebration__date p { margin: 8px 0 0; color: var(--ink); font-size: 18px; line-height: 2.1; }
+
+.wish-night {
+  display: inline-block;
+  position: relative;
+  margin-inline: .12em;
+  padding: .05em .42em .18em;
+  color: transparent;
+  font-size: 1.22em;
+  font-weight: 500;
+  letter-spacing: .01em;
+  line-height: 1.6;
+  white-space: nowrap;
+  vertical-align: baseline;
+  background:
+    linear-gradient(118deg, #8f6a1f 0%, #cfb772 28%, #b18c32 52%, #e4c98a 72%, #a07528 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 1px 0 #fff6) drop-shadow(0 8px 16px #b18c3228);
+  animation: wish-night-shimmer 7s ease-in-out infinite;
+}
+
+.wish-night::before,
+.wish-night::after {
+  content: "✦";
+  position: absolute;
+  top: -.05em;
+  color: var(--gold-soft);
+  -webkit-text-fill-color: var(--gold-soft);
+  font-size: .42em;
+  line-height: 1;
+  opacity: .9;
+  animation: wish-night-sparkle 3.6s ease-in-out infinite;
+}
+
+.wish-night::before { inset-inline-start: -.05em; }
+.wish-night::after {
+  inset-inline-end: -.05em;
+  animation-delay: 1.2s;
+}
+
+@keyframes wish-night-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes wish-night-sparkle {
+  0%, 100% { opacity: .45; transform: scale(.85) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(18deg); }
+}
 .celebration__venue { padding-top: 20px; }
 .celebration address { font-style: normal; font-size: 20px; line-height: 2.3; overflow-wrap: anywhere; }
 

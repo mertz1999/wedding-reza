@@ -1,4 +1,4 @@
-import { wedding } from "./wedding-config.js?v=20261011-1";
+import { wedding } from "./wedding-config.js?v=20261029-1";
 import { getGuestName, getWeddingTimestamp, getCountdown, getNeshanUrl } from "./invitation-data.js";
 
 const card = document.querySelector("#wedding-card");
@@ -59,7 +59,16 @@ if (timestamp !== null) {
     ...options, weekday: "long", day: "numeric", month: "long", year: "numeric",
   }).formatToParts(date);
   const part = (type) => dateParts.find((item) => item.type === type)?.value || "";
-  dateElement.textContent = wedding.dateDisplay?.trim() || `${part("weekday")}، ${part("day")} ${part("month")} ${part("year")}`;
+  const dateLabel = wedding.dateDisplay?.trim() || `${part("weekday")}، ${part("day")} ${part("month")} ${part("year")}`;
+  const occasion = wedding.dateOccasion?.trim();
+  if (occasion) {
+    dateElement.replaceChildren(
+      document.createTextNode(`${dateLabel} - مصادف با `),
+      Object.assign(document.createElement("span"), { className: "wish-night", textContent: occasion }),
+    );
+  } else {
+    dateElement.textContent = dateLabel;
+  }
   setText("wedding-time", hasCeremonyTime ? `ساعت ${new Intl.DateTimeFormat("fa-IR", { ...options, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(date)}` : "ساعت مراسم به‌زودی اعلام می‌شود");
   setText("countdown-heading", hasCeremonyTime ? "تا آغازِ جشن عروسی‌مان" : "تا روزِ عروسی‌مان");
 }
