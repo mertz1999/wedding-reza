@@ -1519,12 +1519,14 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   display: inline-block;
   position: relative;
   margin-inline: .12em;
-  padding: .05em .42em .18em;
-  color: transparent;
+  /* Extra top padding so Nastaliq nuqtat (ش) are not clipped. */
+  padding: .35em .48em .22em;
+  overflow: visible;
+  color: #a07828;
   font-size: 1.22em;
   font-weight: 500;
   letter-spacing: .01em;
-  line-height: 1.6;
+  line-height: 2.15;
   white-space: nowrap;
   vertical-align: baseline;
   background:
@@ -1533,8 +1535,8 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: none;
-  filter: drop-shadow(0 1px 0 #fff6) drop-shadow(0 8px 16px #b18c3228);
+  /* Avoid filter + background-clip:text — WebKit clips Persian dots. */
+  text-shadow: 0 1px 0 #fff8, 0 6px 14px #b18c3224;
   animation: wish-night-shimmer 7s ease-in-out infinite;
 }
 
@@ -1542,13 +1544,14 @@ html.card-is-visible { overflow-x: clip; overflow-y: auto; }
 .wish-night::after {
   content: "✦";
   position: absolute;
-  top: -.05em;
+  top: .2em;
   color: var(--gold-soft);
   -webkit-text-fill-color: var(--gold-soft);
   font-size: .42em;
   line-height: 1;
   opacity: .9;
   animation: wish-night-sparkle 3.6s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .wish-night::before { inset-inline-start: -.05em; }
